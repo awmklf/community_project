@@ -1,0 +1,36 @@
+package community.cmm;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import community.user.service.UserVO;
+
+
+@Controller
+public class HeaderFooterController {
+	@RequestMapping(value = "/header")
+	public String header(ModelMap model, HttpSession session) throws Exception{
+		
+		// 로그인 여부 확인
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (!(authentication instanceof AnonymousAuthenticationToken)) {
+			UserVO user = (UserVO) authentication.getPrincipal();
+			session.setAttribute("userId", user.getUsername());
+			session.setAttribute("role", user.getRole());
+			session.setAttribute("nickname", user.getNickname());
+		}
+		return "cmm/Header";
+	}
+	
+	@RequestMapping(value = "/footer")
+	public String footer() throws Exception{
+		return "cmm/Footer";
+	}
+	
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<Configuration>
+	<Appenders>
+		<!-- 로그 메세지를 콘솔(SYSTEM_OUT)에 출력하는ConsoleAppenders 등록 -->
+		<Console name="console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{HH:mm:ss} %-5p: [%c] %m%n" />
+		</Console>
+	</Appenders>
+	<Loggers>
+
+		<!-- springframework 로그 출력 -->
+		<Logger name="org.springframework" level="DEBUG"
+			additivity="false">
+			<AppenderRef ref="console" />
+		</Logger>
+		
+		
+		<!-- 스프링 시큐리티 로그 출력 -->
+		<Logger name="org.springframework.security" level="DEBUG"
+			additivity="false">
+			<AppenderRef ref="console" />
+		</Logger>
+		
+
+		<!-- cmmunity 로그 출력 -->
+		<Logger name="community" level="DEBUG" additivity="false">
+			<AppenderRef ref="console" />
+		</Logger>
+
+		<!-- sql 로그 출력 -->
+		<Logger name="jdbc.sqltiming" level="DEBUG" additivity="false">
+			<AppenderRef ref="console" />
+		</Logger>
+		<Logger name="jdbc.resultsettable" level="DEBUG" additivity="false">
+			<AppenderRef ref="console" />
+		</Logger>
+
+		<Root level="warn">
+			<AppenderRef ref="Console" />
+		</Root>
+	</Loggers>
+</Configuration>
