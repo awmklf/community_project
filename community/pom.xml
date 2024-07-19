@@ -48,6 +48,21 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- Redis -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-redis -->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-redis</artifactId>
+			<version>2.7.18</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/io.lettuce/lettuce-core -->
+		<dependency>
+			<groupId>io.lettuce</groupId>
+			<artifactId>lettuce-core</artifactId>
+			<version>6.1.10.RELEASE</version>
+		</dependency>
+
+
 		<!-- 스프링 시큐리티 라이브러리 -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-web -->
 		<dependency>
@@ -76,7 +91,7 @@
 			<version>1.18.32</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<!-- JSON라이브러리 JACKSON -->
 		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
 		<dependency>

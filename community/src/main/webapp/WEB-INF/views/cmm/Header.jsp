@@ -10,6 +10,8 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="csrf-token" content="<c:out value='${_csrf.token}'/>"/>
+<meta name="csrf-header" content="<c:out value='${_csrf.headerName}'/>"/>
 <title>Community</title>
 <style>
 	table {

@@ -41,6 +41,16 @@ public class BoardVO extends ComPageVO implements Serializable {
 	/** 게시글 공지영역 등록여부 */
 	private String isNotice;
 
-	/** 작성자 닉네임 */
+	/** 게시글 작성자 닉네임 */
 	private String nickname;
+	/** 현재 유저 아이디 */
+	private String userId;
+	/** 현재 유저 아이피 */
+	private String userIp;
+	/** 관리자 여부 */
+	private String mngAt;
+	/** 조회수 증가 여부 */
+	private String triggerViewCntUp;
+	/** 유저의 게시글 추천 수 */
+	private int numRecommendations;
 }

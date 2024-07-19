@@ -12,6 +12,8 @@
 
 <%-- 기본 URL --%>
 <c:url var="_BASE_PARAM" value="">
+	<c:param name="pageIndex" value="${searchVO.pageIndex}"/>
+	<c:param name="pageUnit" value="${searchVO.pageUnit}"/>
 	<c:if test="${not empty searchVO.searchCondition}"><c:param name="searchCondition" value="${searchVO.searchCondition}"/></c:if>
 	<c:if test="${not empty searchVO.searchKeyword}"><c:param name="searchKeyword" value="${searchVO.searchKeyword}"/></c:if>
 </c:url>
@@ -29,6 +31,7 @@
 <div>
 	<form action="${actionUrl}" method="post" onsubmit="return regist()" id="form" >
 		<input type="hidden" name="boardId" value="${result.boardId}">
+		<input type="hidden" name="registerId" value="${result.registerId}">
 		<div>
 			<select id="" name="category">
 				<option value="1" <c:if test="${result.category eq '1'}">selected="selected"</c:if> >일반</option>
@@ -61,18 +64,34 @@
 		</div>
 		<div>
 			<c:choose>
+				<c:when test="">
+					<sec:authorize access="hasRole('ROLE_ADMIN')">
+					<c:url var="udtUrl" value="board/write${_BASE_PARAM}">
+						<c:param name="boardId" value="${searchVO.boardId}"/>
+					</c:url>
+					<a href="${uptUrl}" id="btn-reg" class="">수정</a>
+					<c:url var="cslUrl" value="/board/view${_BASE_PARAM}">
+						<c:param name="boardId" value="${searchVO.boardId}"/>
+					</c:url>
+					<a href="${cslUrl}" id="btn-cnl">취소</a>
+					</sec:authorize>
+				</c:when>
 				<c:when test="${userId == result.registerId}">
 					<c:url var="udtUrl" value="board/write${_BASE_PARAM}">
 						<c:param name="boardId" value="${searchVO.boardId}"/>
 					</c:url>
 					<a href="${uptUrl}" id="btn-reg" class="">수정</a>
+					<c:url var="cslUrl" value="/board/view${_BASE_PARAM}">
+						<c:param name="boardId" value="${searchVO.boardId}"/>
+					</c:url>
+					<a href="${cslUrl}" id="btn-cnl">취소</a>
 				</c:when>
 				<c:otherwise>
 					<a href="#none" id="btn-reg" class="">등록</a>
+					<c:url var="cslUrl" value="/board/list${_BASE_PARAM}"/>
+					<a href="${cslUrl}" id="btn-cnl">취소</a>
 				</c:otherwise>
 			</c:choose>
-			<c:url var="listUrl" value="/board/list${_BASE_PARAM}"/>
-			<a href="${listUrl}" id="btn-cnl">취소</a>
 		</div>
 		<sec:csrfInput/>
 	</form>
@@ -105,6 +124,14 @@
 		    }
 		  });
 		// 페이지 로드 시에 '비공개 여부' 섹션 표시 여부 체크
+		function updatePrivateSectionVisibility() {
+        	if ($('select[name="category"]').val() == '4') {
+	            $('#privateSection').show();
+	        } else {
+	            $('#privateSection').hide();
+	            $('#othbcAtN').prop('checked', true);
+	        }
+	    }
 		$('select[name="category"]').change(updatePrivateSectionVisibility);
 		updatePrivateSectionVisibility();
 	});

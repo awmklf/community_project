@@ -1,6 +1,7 @@
 package community.user.web;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,16 +61,16 @@ public class UserController {
 		return "redirect:/";
 	}
 
-	/** id 유효성 체크 */
+	/** 아이디 유효성 체크 */
 	@ResponseBody
 	@PostMapping("/user/idCheck")
-	public HashMap<String, String> idCheck(UserVO vo) throws Exception {
+	public Map<String, String> idCheck(UserVO vo) throws Exception {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<String, String>();
 		// 필드 빈칸 확인
 		if (StringUtils.hasText(vo.getUserId())) {
 
-			// 길이 및 알파벳, 숫자 확인
+			// 길이 및 영문, 숫자 확인
 			if (5 <= vo.getUserId().length() && vo.getUserId().length() <= 20 && vo.getUserId().matches("^[a-zA-Z0-9]*$")) {
 				UserVO checkId = userService.checkId(vo.getUserId());
 
@@ -89,9 +90,9 @@ public class UserController {
 	/** 닉네임 유효성 체크 */
 	@ResponseBody
 	@PostMapping("/user/nicknameCheck")
-	public HashMap<String, String> nicknameCheck(UserVO vo) throws Exception {
+	public Map<String, String> nicknameCheck(UserVO vo) throws Exception {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<String, String>();
 		// 필드 빈칸 확인
 		if (StringUtils.hasText(vo.getNickname())) {
 
@@ -115,9 +116,9 @@ public class UserController {
 	/** 비밀번호 유효성 체크 */
 	@ResponseBody
 	@PostMapping("/user/pwdCheck")
-	public HashMap<String, String> pwdCheck(UserVO vo) throws Exception {
+	public Map<String, String> pwdCheck(UserVO vo) throws Exception {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<String, String>();
 		// 필드 빈칸 확인
 		if (StringUtils.hasText(vo.getPassword())) {
 
@@ -138,9 +139,9 @@ public class UserController {
 	/** 비밀번호 질문, 답변 유효성 체크 */
 	@ResponseBody
 	@PostMapping("/user/pwdQnACheck")
-	public HashMap<String, String> pwdQnACheck(UserVO vo) throws Exception {
+	public Map<String, String> pwdQnACheck(UserVO vo) throws Exception {
 
-		HashMap<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<String, String>();
 		// 비밀번호 질문 빈칸 확인
 		if (StringUtils.hasText(vo.getPasswordHint())) {
 			map.put("pwdHintStatus", "green"); // 사용가능
@@ -177,8 +178,8 @@ public class UserController {
 	/** 비밀번호 질문 가져오기 */
 	@ResponseBody
 	@PostMapping(value = "/user/getPwdHint", produces = "application/json; charset=UTF-8")
-	public HashMap<String, String> getPwdHint(UserVO vo, HttpServletRequest request, ModelMap model) throws Exception {
-		HashMap<String, String> map = new HashMap<String, String>();
+	public Map<String, String> getPwdHint(UserVO vo, HttpServletRequest request, ModelMap model) throws Exception {
+		Map<String, String> map = new HashMap<String, String>();
 		if (StringUtils.hasText(vo.getUserId())) { // 아이디 검증
 			UserVO pwdHint = userService.getPwdHint(vo);
 			if (pwdHint != null && StringUtils.hasText(pwdHint.getPasswordHint())) { // 비밀번호 질문 검증
@@ -192,8 +193,8 @@ public class UserController {
 	/** 비밀번호 답 검증 */
 	@ResponseBody
 	@PostMapping("/user/getPwdCnsr")
-	public HashMap<String, String> getPwdCnsr(UserVO vo, HttpServletRequest request, ModelMap model) throws Exception {
-		HashMap<String, String> map = new HashMap<String, String>();
+	public Map<String, String> getPwdCnsr(UserVO vo, HttpServletRequest request, ModelMap model) throws Exception {
+		Map<String, String> map = new HashMap<String, String>();
 		
 		if (StringUtils.hasText(vo.getUserId()) && StringUtils.hasText(vo.getPasswordHint())) { // 아이디, 비밀번호 질문 검증
 			if (StringUtils.hasText(vo.getPasswordCnsr())) { // 비밀번호 답 검증

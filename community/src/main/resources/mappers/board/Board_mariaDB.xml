@@ -3,24 +3,23 @@
 <mapper namespace="community.board.service.BoardDAO">
 
 
-<resultMap type="BoardVO" id="board">
-	<result property="boardId" column="BOARD_ID"/>
-	<result property="category" column="CATEGORY"/>
-	<result property="boardSj" column="BOARD_SJ"/>
-	<result property="boardCn" column="BOARD_CN"/>
-	<result property="inqireCo" column="INQIRE_CO"/>
-	<result property="recommendCnt" column="RECOMMEND_CNT"/>
-	<result property="creatIp" column="CREAT_IP"/>
-	<result property="isNotice" column="IS_NOTICE"/>
-	<result property="othbcAt" column="OTHBC_AT"/>
-	<result property="useAt" column="USE_AT"/>
-	<result property="atchFileId" column="ATCH_FILE_ID"/>
-	<result property="frstRegistPnttm" column="FRST_REGIST_PNTTM"/>
-	<result property="registerId" column="REGISTER_ID"/>
-	<result property="lastUpdtPnttm" column="LAST_UPDT_PNTTM"/>
-	<result property="nickname" column="NICKNAME"/>
-</resultMap>
-
+<!-- <resultMap type="BoardVO" id="board"> -->
+<!-- 	<result property="boardId" column="BOARD_ID"/> -->
+<!-- 	<result property="category" column="CATEGORY"/> -->
+<!-- 	<result property="boardSj" column="BOARD_SJ"/> -->
+<!-- 	<result property="boardCn" column="BOARD_CN"/> -->
+<!-- 	<result property="inqireCo" column="INQIRE_CO"/> -->
+<!-- 	<result property="recommendCnt" column="RECOMMEND_CNT"/> -->
+<!-- 	<result property="creatIp" column="CREAT_IP"/> -->
+<!-- 	<result property="isNotice" column="IS_NOTICE"/> -->
+<!-- 	<result property="othbcAt" column="OTHBC_AT"/> -->
+<!-- 	<result property="useAt" column="USE_AT"/> -->
+<!-- 	<result property="atchFileId" column="ATCH_FILE_ID"/> -->
+<!-- 	<result property="frstRegistPnttm" column="FRST_REGIST_PNTTM"/> -->
+<!-- 	<result property="registerId" column="REGISTER_ID"/> -->
+<!-- 	<result property="lastUpdtPnttm" column="LAST_UPDT_PNTTM"/> -->
+<!-- 	<result property="nickname" column="NICKNAME"/> -->
+<!-- </resultMap> -->
 
 
 <!-- 게시글 목록 조건절 -->
@@ -90,11 +89,11 @@
 <update id="updateViewCnt" parameterType="BoardVO">
 	UPDATE BOARD SET 
 			INQIRE_CO = INQIRE_CO+1 
-	WHERE BOARD_ID = #{boardId};
+	WHERE BOARD_ID = #{boardId}
 </update>
 
 <!-- 게시글 내용 조회 쿼리 -->
-<select id="selectBoard" resultMap="board">
+<select id="selectBoard" resultType="BoardVO">
 	SELECT
 		BOARD_ID
 		, CATEGORY
@@ -159,7 +158,81 @@
 	)
 </insert>
 
+<!-- 게시글 수정 쿼리 -->
+<update id="updateBoard">
+	UPDATE BOARD 
+	SET
+		CATEGORY = #{category}
+		, BOARD_SJ = #{boardSj}
+		, BOARD_CN  = #{boardCn}
+	<if test='mngAt == "Y"'>
+		, IS_NOTICE  = #{isNotice}
+	</if>
+	<if test='category == 4'>
+		, OTHBC_AT  = #{othbcAt}
+	</if>
+		, LAST_UPDT_PNTTM  = NOW()
+	WHERE 
+		BOARD_ID = #{boardId}
+		<if test='mngAt != "Y"'>
+			AND REGISTER_ID = #{userId}
+		</if>
+</update>
 
+<!-- 게시글 삭제 쿼리 -->
+<update id="deleteBoard">
+	UPDATE BOARD 
+	SET USE_AT = 'N'
+	WHERE 
+		BOARD_ID = #{boardId}
+	<if test='mngAt != "Y"'>
+		AND REGISTER_ID = #{userId}
+	</if>
+</update>
 
+<!-- 게시글 추천수 증가 쿼리 -->
+<update id="updateBoardRecCnt">
+	UPDATE BOARD SET 
+			RECOMMEND_CNT = RECOMMEND_CNT+1 
+	WHERE BOARD_ID = #{boardId}
+</update>
+
+<!-- 게시글 추천수 조회 쿼리 -->
+<select id="viewBoardRecCnt" resultType="java.lang.Integer">
+	SELECT
+		RECOMMEND_CNT
+	FROM BOARD 
+	WHERE BOARD_ID = #{boardId}
+</select>
+
+<!-- 게시글 추천 상세 조회 쿼리 -->
+<select id="selectRecommend" resultType="BoardVO">
+	SELECT
+		USER_ID 
+		, BOARD_ID 
+		, NUM_RECOMMENDATIONS
+	FROM RECOMMEND
+	WHERE BOARD_ID = #{boardId}
+		AND USER_ID = #{userId}
+</select>
+<!-- 게시글 추천 상세 추가 쿼리 -->
+<insert id="insertRecommend">
+	INSERT INTO RECOMMEND (
+		USER_ID 
+		, BOARD_ID 
+		, NUM_RECOMMENDATIONS 
+	) VALUES (
+		#{userId}
+		, #{boardId}
+		, 1
+	)
+</insert>
+<!-- 게시글 추천 상세 갱신 쿼리 -->
+<update id="updateRecommend">
+	UPDATE RECOMMEND SET 
+		NUM_RECOMMENDATIONS = NUM_RECOMMENDATIONS+1
+	WHERE BOARD_ID = #{boardId}
+		AND USER_ID = #{userId}
+</update>
 
 </mapper>

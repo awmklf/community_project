@@ -4,14 +4,27 @@
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
 	version="4.0">
 
-	<!-- The definition of the Root Spring Container shared by all Servlets 
-		and Filters -->
+	<!-- The definition of the Root Spring Container shared by all Servlets and Filters -->
+	
+	<!-- 한글 encoding -->
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
 	<!-- Creates the Spring Container shared by all Servlets and Filters -->
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
-
+	
 	<!-- Processes application requests -->
 	<servlet>
 		<servlet-name>appServlet</servlet-name>
@@ -27,14 +40,14 @@
 		<servlet-name>appServlet</servlet-name>
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
-
-	<!-- 서버 시작 로드 페이지 -->
-	<welcome-file-list>
-		<welcome-file>index.jsp</welcome-file>
-	</welcome-file-list>
-	<login-config>
-		<auth-method>BASIC</auth-method>
-	</login-config>
+	
+	<!-- xml 설정파일 등록 -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			classpath*:/spring/config/*-context.xml
+		</param-value>
+	</context-param>
 
 	<!-- 정적 리소스 경로 -->
 	<servlet-mapping>
@@ -45,28 +58,6 @@
 		<servlet-name>default</servlet-name>
 		<url-pattern>/css/*</url-pattern>
 	</servlet-mapping>
-
-	<!-- 한글 encoding -->
-	<filter>
-		<filter-name>encodingFilter</filter-name>
-		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
-		<init-param>
-			<param-name>encoding</param-name>
-			<param-value>UTF-8</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>encodingFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-
-	<!-- 스프링시큐리티 설정파일(security-context) 등록 -->
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>/WEB-INF/spring/root-context.xml
-						/WEB-INF/spring/security-context.xml
-		</param-value>
-	</context-param>
 
 	<!-- 시큐리티 필터 등록 -->
 	<filter>
@@ -89,5 +80,13 @@
 	<session-config>
 		<session-timeout>60</session-timeout>
 	</session-config>
+	
+	<!-- 서버 시작 로드 페이지 -->
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	<login-config>
+		<auth-method>BASIC</auth-method>
+	</login-config>
 
 </web-app>

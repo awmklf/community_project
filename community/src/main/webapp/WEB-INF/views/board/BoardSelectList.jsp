@@ -43,6 +43,9 @@
 				<th class="" scope="col">작성일</th>
 				<th class="" scope="col">조회수</th>
 				<th class="" scope="col">추천수</th>
+				<sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')">
+					<th class="" scope="col">관리</th>
+				</sec:authorize>
 			</tr>
 		</thead>
 		<tbody>
@@ -84,11 +87,31 @@
 					<c:out value="${paginationInfo.totalRecordCount - ((searchVO.pageIndex-1) * searchVO.pageUnit) - (status.count - 1)}"/>
 				</td>
 				<td>
+					<c:choose>
+						<c:when test="${result.category == 1}">
+							<c:set var="categoryName" value="[일반]"/>
+						</c:when>
+						<c:when test="${result.category == 2}">
+							<c:set var="categoryName" value="[정보]"/>
+						</c:when>
+						<c:when test="${result.category == 3}">
+							<c:set var="categoryName" value="[질문]"/>
+						</c:when>
+						<c:when test="${result.category == 4}">
+							<c:set var="categoryName" value="[건의/신고]"/>
+						</c:when>
+					</c:choose>
 					<c:url var="viewUrl" value="/board/view${_BASE_PARAM}">
 						<c:param name="boardId" value="${result.boardId}"/>
 						<c:param name="pageIndex" value="${searchVO.pageIndex}"/>
 					</c:url>
-					<a href="${viewUrl}"><c:out value="${result.boardSj}"/></a>
+					<a href="${viewUrl}">
+						<c:out value="${categoryName}"/> 
+						<c:if test="${result.othbcAt eq 'Y'}">
+							<img alt="비밀글 아이콘" src="">
+						</c:if>
+						<c:out value="${result.boardSj}"/>
+					</a>
 				</td>
 				<td>
 					<c:out value="${result.nickname}"/>
@@ -111,6 +134,15 @@
 				<td>
 					<c:out value="${result.recommendCnt}"/>
 				</td>
+				<sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')">
+					<td>
+		                <c:url var="delUrl" value="/board/delete${_BASE_PARAM}">
+		                    <c:param name="boardId" value="${result.boardId}"/>
+		                    <c:param name="pageIndex" value="${searchVO.pageIndex}"/>
+		                </c:url>
+		                <a href="${delUrl}" id="btn-del" class="btn"><i class="ico-del"></i> 삭제</a>
+		            </td>
+	            </sec:authorize>
 			</tr>
 		</c:forEach>
 		<%-- 게시된 글이 없을 경우 --%>
@@ -215,6 +247,13 @@ $(document).ready(function(){
 	// 게시글 개수 표시 선택
 	$("#selectRecord").change(function() {
 	    $('#pageSizeForm').submit();
+	});
+	
+	// 게시글 삭제
+	$('#btn-del').click(function() {
+		if (!confirm("삭제하시겠습니까?")) {
+			return false;
+		}
 	});
 });
 </script>
