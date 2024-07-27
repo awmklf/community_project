@@ -14,8 +14,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
+/**
+ * 
+ * @author JJ
+ * @see : 로그인 실패 핸들러
+ * 
+ */
 public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
+	/** 로그인 실패 처리 */
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
 		String errorMessage;
@@ -25,7 +32,7 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
 			errorMessage = "로그인 중 문제가 발생했습니다.";
 
 		HttpSession session = request.getSession();
-	    session.setAttribute("errorMessage", errorMessage);
+		session.setAttribute("errorMessage", errorMessage);
 		setDefaultFailureUrl("/user/login");
 		super.onAuthenticationFailure(request, response, e);
 	}

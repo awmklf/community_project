@@ -104,7 +104,7 @@ $(document).ready(function(){
 				$("#pwdValidMsg").show();
 			}
 		}).catch(function(error) {
-			alert("비밀번호 변경 처리 중 오류가 발생하였습니다.");
+			alert("비밀번호 변경 중 문제가 발생하였습니다.");
 		});
 	});
 
@@ -130,14 +130,14 @@ $(document).ready(function(){
 				xhr.setRequestHeader(header, token);
 			},
 			success: function(response){
-				if(response.passwordHint != null){ // 정상 조회
+				if (response.passwordHint == "blank") { // 아이디 미입력
+					$("#idNullMsg").show();
+				} else if(response.passwordHint == "null") { // 아이디 조회 결과 없음
+					$("#notFound").show();
+				} else if(response.passwordHint != null){ // 정상 조회
 					$("#findById_Box").hide();
 					$("#passwordHint").val(response.passwordHint);
 					$("#pwdQnA_Box").show();
-				} else if (response.blankField != null) { // 아이디 미입력
-					$("#idNullMsg").show();
-				} else { // 아이디 조회 결과 없음
-					$("#notFound").show();
 				}
 			},
 			error: function(error){
@@ -185,7 +185,7 @@ $(document).ready(function(){
 		var pwdStatus = null;
 		try {
 			pwdStatus = await $.ajax({
-				url: '/user/pwdCheck',
+				url: '/user/checkPwd',
 				type: 'post',
 				data: {password: password},
 				beforeSend: function(xhr){

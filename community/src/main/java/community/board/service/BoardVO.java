@@ -53,4 +53,9 @@ public class BoardVO extends ComPageVO implements Serializable {
 	private String triggerViewCntUp;
 	/** 유저의 게시글 추천 수 */
 	private int numRecommendations;
+
+	public void setCreatIp(String creatIp) {
+		this.creatIp = creatIp;
+	}
+
 }

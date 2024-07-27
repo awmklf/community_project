@@ -7,11 +7,9 @@ import lombok.Setter;
 
 /**
  * 
- * 페이징을 위한 공통 VO클래스
- * 
  * @author JJ
- * @since 2024.06
- * @version 1.0
+ * @see : 페이징을 위한 공통 VO클래스
+ * 
  */
 @Getter
 @Setter
@@ -31,20 +29,15 @@ public class ComPageVO implements Serializable {
     private int pageUnit = 10;
 
     /** 페이지 리스트 내 페이지 개수 */
-    private int pageSize = 2;
+    private int pageSize = 2; // 테스트를 위해 2로 설정
 
-    /** firstIndex */
+    /** firstIndex(쿼리용) */
     private int firstIndex = 1;
 
     /** lastIndex */
     private int lastIndex = 1;
 
-    /** recordCountPerPage */
+    /** recordCountPerPage(쿼리용) */
     private int recordCountPerPage = 10;
 
-    /** 검색KeywordFrom */
-//    private String searchKeywordFrom = "";
-
-	/** 검색KeywordTo */
-//    private String searchKeywordTo = "";
 }

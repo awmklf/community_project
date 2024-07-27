@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans:beans xmlns="http://www.springframework.org/schema/security"
-				xmlns:beans="http://www.springframework.org/schema/beans"
-				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				xsi:schemaLocation="http://www.springframework.org/schema/security 
-									http://www.springframework.org/schema/security/spring-security.xsd
-									http://www.springframework.org/schema/beans 
-									https://www.springframework.org/schema/beans/spring-beans.xsd">
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
     
-    <!-- 시큐리티 -->
+    <!-- 시큐리티 설정 -->
+    
     <!-- use-expressions : 스프링 표현 언어(spEL) 사용여부 -->
-    <http auto-config="true" use-expressions="true">
+    <http auto-config="true" use-expressions="true" entry-point-ref="customAuthenticationEntryPoint">
     	<!-- 시큐리티 감시 url 및 url에 접근 가능 권한 정의 -->
-<!--         <intercept-url pattern="/board/post" access="isAuthenticated()"/> -->
-<!--         <intercept-url pattern="/board/insert" access="isAuthenticated()"/> -->
-<!--         <intercept-url pattern="/board/update" access="isAuthenticated()"/> -->
-<!--         <intercept-url pattern="/board/delete" access="isAuthenticated()"/> -->
-        <access-denied-handler error-page="/cmm/error/403"/>
+    		<intercept-url pattern="/board/test" access="isAuthenticated()"/>
+		
+		<!-- 접근 거부 처리 -->
+        <access-denied-handler ref="customAccessDeniedHandler"/>
 
         <!-- 로그인 기능 -->
 		<form-login login-page="/user/login"
@@ -34,7 +32,7 @@
 	        <concurrency-control max-sessions="1" error-if-maximum-exceeded="true" />
 	    </session-management>
     </http>
-
+    
 	<!-- 사용자 권한 서비스 -->
     <authentication-manager>
     	<!-- 사용자 정보 인증 요청 -->
@@ -43,8 +41,9 @@
         </authentication-provider>
     </authentication-manager>
     
-    <!-- 시큐리티 암호화 객체 등록 -->
+    <!-- 시큐리티 객체 등록 -->
     <beans:bean id="bCryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
-    <beans:bean id="customAuthenticationFailureHandler" class="community.cmm.security.CustomAuthenticationFailureHandler"></beans:bean>
-
+    <beans:bean id="customAuthenticationFailureHandler" class="community.cmm.security.CustomAuthenticationFailureHandler"/>
+    <beans:bean id="customAuthenticationEntryPoint" class="community.cmm.security.CustomAuthenticationEntryPoint" />
+	<beans:bean id="customAccessDeniedHandler" class="community.cmm.security.CustomAccessDeniedHandler" />
 </beans:beans>

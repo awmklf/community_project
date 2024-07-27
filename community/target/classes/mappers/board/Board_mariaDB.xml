@@ -32,17 +32,17 @@
 		</when>
 		<otherwise>
 			<if test='searchCondition != null and searchCondition !="" '>
-				<choose>
-					<when test='searchCondition == "0"'>
-						AND A.BOARD_SJ LIKE concat('%', #{searchKeyword}, '%')
-					</when>
-					<when test='searchCondition == "1"'>
-						AND A.BOARD_CN LIKE concat('%', #{searchKeyword}, '%')
-					</when>
-					<when test='searchCondition == "2"'>
-						AND B.USER_ID LIKE concat('%', #{searchKeyword}, '%')
-					</when>
-				</choose>
+			<choose>
+				<when test='searchCondition == "0"'>
+					AND A.BOARD_SJ LIKE concat('%', #{searchKeyword}, '%')
+				</when>
+				<when test='searchCondition == "1"'>
+					AND A.BOARD_CN LIKE concat('%', #{searchKeyword}, '%')
+				</when>
+				<when test='searchCondition == "2"'>
+					AND B.USER_ID LIKE concat('%', #{searchKeyword}, '%')
+				</when>
+			</choose>
 			</if>
 		</otherwise>
 		</choose>

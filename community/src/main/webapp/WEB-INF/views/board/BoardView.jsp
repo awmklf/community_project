@@ -108,7 +108,6 @@
 			var boardId = $("#boardId").val();
 			var recCnt;
 			var currentRecCount = parseInt($('#rec-count').text());
-			console.log(currentRecCount);
 			
 			try {
 				response = await $.ajax({
@@ -120,6 +119,7 @@
 					},
 					beforeSend: function(xhr){
 						xhr.setRequestHeader(header, token);
+						xhr.setRequestHeader("Accept", "application/json");
 					}
 				});
 				console.log(recCnt);
@@ -129,8 +129,13 @@
 					alert(response.message);
 				}
 			} catch (error) {
-				console.log(error);
-				alert("처리중 오류가 발생하였습니다.");
+				// console.log(error);
+				if (error.responseJSON && error.responseJSON.message) {
+			        alert(error.responseJSON.message);
+			    }
+				else {
+					alert("처리중 오류가 발생하였습니다.");
+				}
 			}
 		});
 		

@@ -17,7 +17,7 @@
 		</Logger>
 		
 		<!-- 스프링 시큐리티 로그 출력 -->
-		<Logger name="org.springframework.security" level="DEBUG"
+		<Logger name="org.springframework.security" level="TRACE"
 			additivity="false">
 			<AppenderRef ref="console" />
 		</Logger>

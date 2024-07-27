@@ -106,7 +106,7 @@
 			var response = null;
 			try {
 				response = await $.ajax({
-					url: '/user/idCheck',
+					url: '/user/checkId',
 					type: 'post',
 					data: {userId: userId},
 					beforeSend: function(xhr){
@@ -141,7 +141,7 @@
 			var response = null;
 			try {
 				response = await $.ajax({
-					url: '/user/nicknameCheck',
+					url: '/user/checkNickname',
 					type: 'post',
 					data: {nickname: nickname},
 					beforeSend: function(xhr){
@@ -176,7 +176,7 @@
 			var response = null;
 			try {
 				response= await $.ajax({
-					url: '/user/pwdCheck',
+					url: '/user/checkPwd',
 					type: 'post',
 					data: {password: password},
 					beforeSend: function(xhr){
@@ -210,7 +210,7 @@
 			var pwdQnA = null;
 			try {
 				response = await $.ajax({
-					url: '/user/pwdQnACheck',
+					url: '/user/checkPwdQnA',
 					type: 'post',
 					data: {passwordHint: passwordHint
 							, passwordCnsr: passwordCnsr

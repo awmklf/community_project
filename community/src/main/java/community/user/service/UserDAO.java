@@ -9,10 +9,10 @@ public interface UserDAO {
 	public void insert(UserVO vo) throws Exception;
 
 	/** 회원가입 유효성 검증(id) */
-	public UserVO checkId(String userId) throws Exception;
+	public UserVO checkId(UserVO vo) throws Exception;
 
 	/** 회원가입 유효성 검증(Nickname) */
-	public UserVO checkNickname(String nickname) throws Exception;
+	public UserVO checkNickname(UserVO vo) throws Exception;
 
 	/** 로그인(스프링 시큐리티) */
 	public UserVO login(String userId);

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+       xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+                           http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- LettuceConnectionFactory 빈 등록 -->
+	<bean id="redisConnectionFactory" class="org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory">
+	    <constructor-arg>
+	        <bean class="org.springframework.data.redis.connection.RedisStandaloneConfiguration">
+	            <constructor-arg index="0" value="${Globals.LocalIp}"/>
+	            <constructor-arg index="1" value="${Globals.Port}"/>
+	        </bean>
+	    </constructor-arg>
+	</bean>
+	
+	<!-- RedisTemplate 빈 등록 -->
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+	    <property name="connectionFactory" ref="redisConnectionFactory"/>
+	    <property name="keySerializer">
+	        <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+	    </property>
+	    <property name="valueSerializer">
+	        <bean class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer"/>
+	    </property>
+	</bean>
+	
+	<!-- JNDI 빈 등록 -->
+	<bean id="dSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+    	<property name="jndiName" value="java:comp/env/jdbc/communityDB"/>
+	</bean>
+	
+	<!--MyBatis 매퍼 클래스 auto detect -->
+	<mybatis-spring:scan base-package="community" annotation="org.apache.ibatis.annotations.Mapper"/>
+	
+	<!-- SqlSessionTemplate 빈 등록 -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory" />
+	</bean>
+	
+	<!-- MyBatis sqlSessionFactory 등록 및 설정 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dSource" />
+		<property name="mapperLocations" value="classpath*:/mappers/**/*.xml" />
+		<property name="typeAliasesPackage" value="community"/>
+		<property name="configuration">
+			<bean class="org.apache.ibatis.session.Configuration">
+				<property name="mapUnderscoreToCamelCase" value="true"/>
+			</bean>
+		</property>
+	</bean>
+
+</beans>

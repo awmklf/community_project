@@ -1,11 +1,16 @@
 package community.board.service;
 
-import java.util.List;
+import java.util.Map;
+
+import community.cmm.pagination.PaginationCalc;
 
 public interface BoardService {
 
 	/** 게시글 목록 조회 */
-	public List<BoardVO> selectBoardList(BoardVO vo) throws Exception;
+	public Map<String, Object> selectBoardList(BoardVO vo) throws Exception;
+	
+	/** 페이지네이션 */
+	public PaginationCalc pagination(BoardVO vo) throws Exception;
 
 	/** 게시글 수 조회 */
 	public int selectBoardListCnt(BoardVO vo) throws Exception;
@@ -13,8 +18,9 @@ public interface BoardService {
 	/** 게시글 내용 조회 */
 	public BoardVO selectBoard(BoardVO vo) throws Exception;
 	
-	/** 비밀글 확인 */
-	public Boolean othbcChk(BoardVO vo) throws Exception;
+	/** 접근 권한 확인 
+	 * @return */
+	public String roleChk(BoardVO vo) throws Exception;
 
 	/** 게시글 작성 */
 	public String insertBoard(BoardVO vo) throws Exception;

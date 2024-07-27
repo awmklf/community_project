@@ -8,7 +8,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-
+/**
+ * 
+ * @author JJ
+ * @see : 로그인 성공 핸들러
+ * 
+ */
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
 	/** 로그인 성공 처리 */

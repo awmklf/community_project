@@ -7,13 +7,20 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 public interface UserService extends UserDetailsService {
 
 	/** 회원가입 */
-	public void insert(UserVO vo) throws Exception;
+	public boolean createAccount(UserVO vo) throws Exception;
 
 	/** 회원가입 유효성 검증(id) */
-	public UserVO checkId(String userId) throws Exception;
+	public String checkId(UserVO vo) throws Exception;
 
 	/** 회원가입 유효성 검증(Nickname) */
-	public UserVO checkNickname(String nickname) throws Exception;
+	public String checkNickname(UserVO vo) throws Exception;
+
+	/** 회원가입 유효성 검증(Password) */
+	public String checkPassword(UserVO vo) throws Exception;
+
+	/** 회원가입 유효성 검증(Password QnA) */
+	public String checkPwdQuestion(UserVO vo) throws Exception;
+	public String checkPwdAnswer(UserVO vo) throws Exception;
 
 	/** 로그인(스프링 시큐리티) */
 	@Override
@@ -21,14 +28,14 @@ public interface UserService extends UserDetailsService {
 
 	/** 유저 정보 불러오기 */
 	public UserVO selectUserInfo(UserVO vo) throws Exception;
-	
+
 	/** 비밀번호 힌트 가져오기 */
-	public UserVO getPwdHint(UserVO vo) throws Exception;
-	
+	public String getPwdHint(UserVO vo) throws Exception;
+
 	/** 비밀번호 힌트, 답 검증 */
-	public int pwdCnsrVaild(UserVO vo) throws Exception;
-	
+	public String checkPwdCnsr(UserVO vo) throws Exception;
+
 	/** 비밀번호 변경 */
-	public void changePwd(UserVO vo) throws Exception;
-	
+	public String changePwd(UserVO vo) throws Exception;
+
 }
