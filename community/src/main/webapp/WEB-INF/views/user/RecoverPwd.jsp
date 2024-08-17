@@ -8,15 +8,25 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="csrf-token" content="<c:out value='${_csrf.token}'/>"/>
-<meta name="csrf-header" content="<c:out value='${_csrf.headerName}'/>"/>
-<title>Community</title>
+<sec:csrfMetaTags/>
+<title>비밀번호 변경 - 커뮤니티</title>
+<style>
+	div {
+			margin: 20px;
+			padding: 10px;
+			border: 1px solid #ccc;
+			background-color: #f9f9f9;
+		}
+</style>
 </head>
 <body>
 <c:url var="url" value="/user"/>
 
 <div>
 	<a href="/">HOME</a>
+</div>
+<div>
+	비밀번호 찾기
 </div>
 <!-- 아이디 조회 영역 -->
 <div id="findById_Box">
@@ -62,8 +72,8 @@
 <script src="/js/jquery-3.7.1.min.js"></script>
 <script>
 $(document).ready(function(){
-	var token = $("meta[name='csrf-token']").attr("content");
-    var header = $("meta[name='csrf-header']").attr("content");
+	var token = $("meta[name='_csrf']").attr("content");
+	var header = $("meta[name='_csrf_header']").attr("content");
     
     // 아이디 필드 메세지 초기화
     $("#id").keydown(function() {

@@ -1,18 +1,15 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%@ taglib prefix="sec"
-	uri="http://www.springframework.org/security/tags"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" 	uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="c" 		uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" 		uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt"   	uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="sec"		uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="csrf-token" content="<c:out value='${_csrf.token}'/>"/>
-<meta name="csrf-header" content="<c:out value='${_csrf.headerName}'/>"/>
-<title>Community</title>
+<sec:csrfMetaTags/>
+<title>${param.title}</title>
 <style>
 	table {
 		width: 100%;
@@ -28,14 +25,32 @@
 		background-color: #f9f9f9;
 	}
 	div {
-		margin: 20px;
+		margin: 10px;
 		padding: 10px;
 		border: 1px solid #ccc;
 		background-color: #f9f9f9;
 	}
+	.boardCn div {
+		margin: 0px;
+		padding: 0px;
+		border: 0px;
+		background-color: #f9f9f9;
+	}
+	a {
+		text-decoration: none;
+		color: black;
+	}
+	
+	.reply-indent {
+	    margin-left: 100px;
+	    padding: 10px;
+	    border: 1px solid #ccc;
+	    border-radius: 5px;
+	    background-color: #f9f9f9;
+	}
 </style>
-<script src="/js/jquery-3.7.1.min.js"></script>
-
+<!-- <script src="/js/jquery-3.7.1.min.js"></script> -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
 	<header class="">

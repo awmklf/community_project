@@ -7,7 +7,7 @@
 
 <!-- 헤더 -->
 <c:import url="/header" charEncoding="utf-8">
-		<c:param name="title" value="커뮤니티"/>
+		<c:param name="title" value="${result.boardSj} - 커뮤니티"/>
 </c:import>
 
 <%-- 기본 URL --%>
@@ -17,9 +17,8 @@
 	<c:if test="${not empty searchVO.searchCondition}"><c:param name="searchCondition" value="${searchVO.searchCondition}"/></c:if>
 	<c:if test="${not empty searchVO.searchKeyword}"><c:param name="searchKeyword" value="${searchVO.searchKeyword}"/></c:if>
 </c:url>
-
-<input type="hidden" name="boardId" id="boardId" value="<c:out value="${result.boardId}"/>">
-
+<input type="hidden" id="boardIdNum" value="<c:out value="${result.boardIdNum}"/>">
+<%-- 게시글 내용 영역 --%>
 <div>
 	<div> 
 		<c:choose>
@@ -41,109 +40,103 @@
 	</div>
 	<div>
 		작성자 : <span><c:out value="${result.nickname}"/></span> <br>
-		작성일 : <span><fmt:formatDate value="${result.frstRegistPnttm}" pattern="yyyy.MM.dd HH:mm:ss" /></span> <br>
+		작성일 : <span><fmt:formatDate value="${result.frstRegistPnttm}" pattern="yyyy.MM.dd HH:mm:ss" /></span>
 		<c:if test="${not empty result.lastUpdtPnttm}">
-			수정일 : <span><fmt:formatDate value="${result.lastUpdtPnttm}" pattern="yyyy.MM.dd HH:mm:ss" /></span> <br>
+			(<span><fmt:formatDate value="${result.lastUpdtPnttm}" pattern="yyyy.MM.dd HH:mm:ss" /></span> 수정됨)
 		</c:if>
+		<br>
 		조회수 : <span><c:out value="${result.inqireCo}"/></span> <br>
 		추천수 : <span class="recView"><c:out value="${result.recommendCnt}"/></span> <br>
 	</div>
 	<div>
-		<span><c:out value="${result.boardCn}" escapeXml="false"/></span>
+		<span class="boardCn"><c:out value="${result.boardCn}" escapeXml="false"/></span>
 	</div>
 	<div>
 		<button type="button" id="btn-rec">추천</button>
 		<span id="rec-count" class="recView"><c:out value="${result.recommendCnt}"/></span>
 	</div>
 </div>
+<%-- 게시글 액션 영역 --%>
 <div>
-	<c:if test="${not empty searchVO.boardId}">
+	<c:if test="${not empty searchVO.boardIdNum}">
+		<c:url var="udtUrl" value="/board/${searchVO.boardIdNum}/edit${_BASE_PARAM}"/>
+		<c:url var="delUrl" value="/board/${searchVO.boardIdNum}/delete${_BASE_PARAM}"/>
+		<form id="delForm" action="${delUrl}" method="post" style="display: none;">
+			<input type="hidden" name="registerId" value="${result.registerId}" />
+			<sec:csrfInput/>
+		</form>
 		<c:choose>
 			<%-- 글 작성자 확인 --%>
 			<c:when test="${userId == result.registerId}">
-				<c:url var="udtUrl" value="/board/post${_BASE_PARAM}">
-					<c:param name="boardId" value="${searchVO.boardId}"/>
-				</c:url>
 				<a href="${udtUrl}">수정</a>
-				<c:url var="delUrl" value="/board/delete${_BASE_PARAM}">
-					<c:param name="boardId" value="${searchVO.boardId}"/>
-					<c:param name="registerId" value="${result.registerId}" />
-				</c:url>
-				<a href="${delUrl}" id="btn-del" class="btn"><i class="ico-del"></i> 삭제</a>
+				<a id="btn-del" class="btn" href="#">삭제</a>
 			</c:when>
             <%-- 관리자 또는 매니저에게 수정 및 삭제 링크 표시 --%>
 			<c:otherwise>
 	            <sec:authorize access="hasRole('ROLE_ADMIN')">
-	                <c:url var="udtUrl" value="/board/post${_BASE_PARAM}">
-	                    <c:param name="boardId" value="${searchVO.boardId}"/>
-	                </c:url>
 	                <a href="${udtUrl}">수정</a>
 	            </sec:authorize>
 	            <sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')">
-	                <c:url var="delUrl" value="/board/delete${_BASE_PARAM}">
-	                    <c:param name="boardId" value="${searchVO.boardId}"/>
-	                    <c:param name="registerId" value="${result.registerId}" />
-	                </c:url>
-	                <a href="${delUrl}" id="btn-del" class="btn"><i class="ico-del"></i> 삭제</a>
+					<a id="btn-del" class="btn" href="#">삭제</a>
 	            </sec:authorize>
 	       </c:otherwise>
 		</c:choose>
 	</c:if>
-	<c:url var="listUrl" value="/board/list${_BASE_PARAM}"/>
+	<c:url var="listUrl" value="/board${_BASE_PARAM}"/>
 	<a href="${listUrl}" class="btn">목록</a>
 </div>
-
+<%-- 덧글 영역 --%>
+<c:import url="/WEB-INF/views/board/Reply.jsp" charEncoding="utf-8"/>
 
 <script>
 	$(document).ready(function() {
-		
-		var token = $("meta[name='csrf-token']").attr("content");
-	    var header = $("meta[name='csrf-header']").attr("content");
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		var boardIdNum = $("#boardIdNum").val();
 		
 		// 게시글 추천
 		$('#btn-rec').click(async function() {
 			if (!confirm("추천하시겠습니까?")) {
 				return false;
 			}
-			var boardId = $("#boardId").val();
 			var recCnt;
 			var currentRecCount = parseInt($('#rec-count').text());
 			
 			try {
 				response = await $.ajax({
-					url: '/board/recommend',
+					url: '/board/' + boardIdNum + '/recommend',
 					type: 'post',
 					data: {
-						boardId: boardId
-						, recommendCnt: currentRecCount
+						recommendCnt: currentRecCount
 					},
 					beforeSend: function(xhr){
 						xhr.setRequestHeader(header, token);
 						xhr.setRequestHeader("Accept", "application/json");
 					}
 				});
-				console.log(recCnt);
+// 				console.log(recCnt);
 				if (response.recCnt != null) {
 					$(".recView").text(response.recCnt); // 추천수 갱신
 				} else {
 					alert(response.message);
 				}
 			} catch (error) {
-				// console.log(error);
+// 				console.log(error);
 				if (error.responseJSON && error.responseJSON.message) {
 			        alert(error.responseJSON.message);
-			    }
-				else {
+			    } else {
 					alert("처리중 오류가 발생하였습니다.");
 				}
 			}
 		});
 		
+
 		// 게시글 삭제
 		$('#btn-del').click(function() {
 			if (!confirm("삭제하시겠습니까?")) {
 				return false;
 			}
+			$("#delForm").submit();
 		});
 		
 	});

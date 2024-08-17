@@ -13,27 +13,58 @@
 <%-- 기본 URL --%>
 <c:url var="_BASE_PARAM" value="">
 	<c:param name="pageUnit" value="${searchVO.recordCountPerPage}"/>
+	<c:if test="${not empty searchVO.category}"><c:param name="category" value="${searchVO.category}"/></c:if>
 	<c:if test="${not empty searchVO.searchCondition}"><c:param name="searchCondition" value="${searchVO.searchCondition}"/></c:if>
 	<c:if test="${not empty searchVO.searchKeyword}"><c:param name="searchKeyword" value="${searchVO.searchKeyword}"/></c:if>
 </c:url>
 
 <%-- 게시글 목록 수 영역 --%>
 <div>
-	<form id="pageSizeForm" action="/board/list" method="post">
+	<form id="pageSizeForm" action="/board" method="post">
 		<input type="hidden" name="searchCondition" value="${searchVO.searchCondition}"/>
 		<input type="hidden" name="searchKeyword" value="${searchVO.searchKeyword}"/>
 		<select id="selectRecord" name="pageUnit">
-			<option value="1" <c:if test="${searchVO.recordCountPerPage eq '1'}">selected="selected"</c:if> >1개</option>
-			<option value="10" <c:if test="${searchVO.recordCountPerPage eq '10'}">selected="selected"</c:if> >10개</option>
-			<option value="30" <c:if test="${searchVO.recordCountPerPage eq '30'}">selected="selected"</c:if> >30개</option>
-			<option value="50" <c:if test="${searchVO.recordCountPerPage eq '50'}">selected="selected"</c:if> >50개</option>
+		
+			<%-- <option value="1" ${searchVO.recordCountPerPage eq '1' ? 'selected' : ''} >1개</option> --%>
+			<option value="10" ${searchVO.recordCountPerPage eq '10' ? 'selected' : ''} >10개</option>
+			<option value="30" ${searchVO.recordCountPerPage eq '30' ? 'selected' : ''} >30개</option>
+			<option value="50" ${searchVO.recordCountPerPage eq '50' ? 'selected' : ''} >50개</option>
 		</select>
 		<sec:csrfInput/>
 	</form>
 </div>
-
 <!-- 게시글 영역 -->
 <div id="postList">
+<!-- 게시글 카테고리 -->
+<div>
+	<c:url var="allPost" value="/board"/>
+	<a href="${allPost}" class="${empty param.category ? 'active' : 'inactive'}">전체</a>
+	|
+	<c:url var="recommendPost" value="/board">
+		<c:param name="category" value="-1"/>
+	</c:url>
+	<a href="${recommendPost}" class="${param.category == -1 ? 'active' : 'inactive'}">추천</a>
+	|
+	<c:url var="generalPost" value="/board">
+		<c:param name="category" value="1"/>
+	</c:url>
+	<a href="${generalPost}" class="${param.category == 1 ? 'active' : 'inactive'}">일반</a>
+	|
+	<c:url var="infoPost" value="/board">
+		<c:param name="category" value="2"/>
+	</c:url>
+	<a href="${infoPost}" class="${param.category == 2 ? 'active' : 'inactive'}">정보</a>
+	|
+	<c:url var="questionPosts" value="/board">
+		<c:param name="category" value="3"/>
+	</c:url>
+	<a href="${questionPosts}" class="${param.category == 3 ? 'active' : 'inactive'}">질문</a>
+	|
+	<c:url var="suggestionReportPost" value="/board">
+		<c:param name="category" value="4"/>
+	</c:url>
+	<a href="${suggestionReportPost}" class="${param.category == 4 ? 'active' : 'inactive'}">건의/신고</a>
+</div>
 	<table>
 		<thead>
 			<tr>
@@ -54,11 +85,10 @@
 			<tr class="notice">
 				<td class="num"><span class="label-bbs spot">공지</span></td>
 				<td class="tit">
-					<c:url var="viewUrl" value="/board/view${_BASE_PARAM}">
-						<c:param name="boardId" value="${result.boardId}"/>
+					<c:url var="viewUrl" value="/board/${result.boardIdNum}${_BASE_PARAM}">
 						<c:param name="pageIndex" value="${searchVO.pageIndex}"/>
 					</c:url>
-					<a href="${viewUrl}"><c:out value="${result.boardSj}"/></a>
+					<a href="${viewUrl}"><c:out value="${result.boardSj} [${result.replyCnt}]"/></a>
 				</td>
 				<td class="writer" data-cell-header="작성자 : "><c:out value="${result.nickname}"/></td>
 				<td class="date" data-cell-header="작성일 : ">
@@ -101,8 +131,7 @@
 							<c:set var="categoryName" value="[건의/신고]"/>
 						</c:when>
 					</c:choose>
-					<c:url var="viewUrl" value="/board/view${_BASE_PARAM}">
-						<c:param name="boardId" value="${result.boardId}"/>
+					<c:url var="viewUrl" value="/board/${result.boardIdNum}${_BASE_PARAM}">
 						<c:param name="pageIndex" value="${searchVO.pageIndex}"/>
 					</c:url>
 					<a href="${viewUrl}">
@@ -110,7 +139,7 @@
 						<c:if test="${result.othbcAt eq 'Y'}">
 							<img alt="비밀글 아이콘" src="">
 						</c:if>
-						<c:out value="${result.boardSj}"/>
+						<c:out value="${result.boardSj} [${result.replyCnt}]"/>
 					</a>
 				</td>
 				<td>
@@ -136,8 +165,7 @@
 				</td>
 				<sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')">
 					<td>
-		                <c:url var="delUrl" value="/board/delete${_BASE_PARAM}">
-		                    <c:param name="boardId" value="${result.boardId}"/>
+		                <c:url var="delUrl" value="/board/${result.boardIdNum}/delete${_BASE_PARAM}">
 		                    <c:param name="pageIndex" value="${searchVO.pageIndex}"/>
 		                </c:url>
 		                <a href="${delUrl}" id="btn-del" class="btn"><i class="ico-del"></i> 삭제</a>
@@ -145,7 +173,7 @@
 	            </sec:authorize>
 			</tr>
 		</c:forEach>
-		<%-- 게시된 글이 없을 경우 --%>
+		<%-- 조건에 맞는 글이 없을 경우 --%>
 		<c:if test="${fn:length(resultList) == 0}">
 			<tr class="empty"><td colspan="6">검색 데이터가 없습니다.</td></tr>
 		</c:if>
@@ -158,14 +186,14 @@
 	<div id="paging">
 		<%-- 처음 --%>
 		<c:if test="${paginationInfo.firstPageNoOnPageList != 1}">
-			<c:url var="firstPageUrl" value="/board/list${_BASE_PARAM}">
+			<c:url var="firstPageUrl" value="/board${_BASE_PARAM}">
 				<c:param name="pageIndex" value="1"/>
 			</c:url>
 			<a href="${firstPageUrl}">처음</a>
 		</c:if>
 		<%-- 이전 --%>
 		<c:if test="${paginationInfo.currentPageNo !=1}">
-			<c:url var="prevPageUrl" value="/board/list${_BASE_PARAM}">
+			<c:url var="prevPageUrl" value="/board${_BASE_PARAM}">
 				<c:param name="pageIndex" value="${paginationInfo.prevPage}"/>
 			</c:url>
 			<a href="${prevPageUrl}">이전</a>
@@ -177,7 +205,7 @@
 					<span>${pageNum}</span>
 				</c:when>
 				<c:otherwise>
-					<c:url var="pageUrl" value="/board/list${_BASE_PARAM}">
+					<c:url var="pageUrl" value="/board${_BASE_PARAM}">
 						<c:param name="pageIndex" value="${pageNum}"/>
 					</c:url>
 					<a href="${pageUrl}">${pageNum}</a>
@@ -186,14 +214,14 @@
 		</c:forEach>
 		<%-- 다음 --%>
 		<c:if test="${paginationInfo.currentPageNo != paginationInfo.totalPageCount}"> 
-			<c:url var="nextPageUrl" value="/board/list${_BASE_PARAM}">
+			<c:url var="nextPageUrl" value="/board${_BASE_PARAM}">
 				<c:param name="pageIndex" value="${paginationInfo.nextPage}"/>
 			</c:url>
 			<a href="${nextPageUrl}">다음</a>
 		</c:if>
 		<%-- 마지막 --%>
 		<c:if test="${paginationInfo.lastPageNoOnPageList != paginationInfo.totalPageCount}">
-			<c:url var="lastPageUrl" value="/board/list${_BASE_PARAM}">
+			<c:url var="lastPageUrl" value="/board${_BASE_PARAM}">
 				<c:param name="pageIndex" value="${paginationInfo.totalPageCount}"/>
 			</c:url>
 			<a href="${lastPageUrl}">마지막</a>
@@ -202,7 +230,7 @@
 	
 	
 	<div>
-		<c:url var="postUrl" value="/board/post${_BASE_PARAM}"/>
+		<c:url var="postUrl" value="/board/write${_BASE_PARAM}"/>
 		<a href="${postUrl}">글쓰기</a>
 	</div>
 </div>
@@ -210,10 +238,10 @@
 
 
 <%-- 검색 영역 --%>
-<form action="/board/list" method="post">
+<form action="/board" method="post">
 	<input type="hidden" name="pageUnit" value="${searchVO.recordCountPerPage}"/>
 	<fieldset>
-		<legend>검색조건입력폼</legend>
+		<legend>검색</legend>
 		<label for="ftext" class="">검색분류선택</label>
 		<select name="searchCondition" id="ftext">
 			<option value="0" <c:if test="${searchVO.searchCondition eq '0'}">selected="selected"</c:if> >제목</option> 

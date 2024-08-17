@@ -84,6 +84,8 @@ public class UserController {
 	/** 로그인 */
 	@GetMapping("/user/login")
 	public String loginForm(HttpServletRequest request, ModelMap model) throws Exception {
+		String referrer = request.getHeader("Referer");
+		request.getSession().setAttribute("prevPage", referrer);
 		return "user/Login";
 	}
 
@@ -91,6 +93,11 @@ public class UserController {
 	@PostMapping("/user/logout")
 	public void logout() throws Exception {
 	}
+	
+	/** 세션 연장 */
+	@GetMapping("/keep-alive")
+    public void keepAlive() {
+    }
 
 	/** 비밀번호 찾기 페이지 */
 	@GetMapping("/user/recoverPwd")

@@ -8,16 +8,25 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="csrf-token" content="<c:out value='${_csrf.token}'/>"/>
-<meta name="csrf-header" content="<c:out value='${_csrf.headerName}'/>"/>
-<title>Community</title>
+<sec:csrfMetaTags/>
+<title>회원가입 - 커뮤니티</title>
+<style>
+	div {
+			margin: 20px;
+			padding: 10px;
+			border: 1px solid #ccc;
+			background-color: #f9f9f9;
+		}
+</style>
 </head>
 <body>
 <div>
-	<div>
-		<a href="/">HOME</a>
-	</div>
-	<p>회원가입</p>
+	<a href="/">HOME</a>
+</div>
+<div>
+	회원가입
+</div>
+<div>
 	<c:url var="url" value="/user"/>
 	<form action="${url}/signup" method="post" id="signUpForm">
 		<label for="id">아이디 : </label>
@@ -57,9 +66,8 @@
 <script src="/js/jquery-3.7.1.min.js"></script>
 <script>
 	$(document).ready(function(){
-		
-		var token = $("meta[name='csrf-token']").attr("content");
-	    var header = $("meta[name='csrf-header']").attr("content");
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
 	    
 	    // 아이디 유효성 검사
 	    $("#id").keyup(validateId);

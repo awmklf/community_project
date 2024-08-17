@@ -58,6 +58,10 @@
 		<servlet-name>default</servlet-name>
 		<url-pattern>/css/*</url-pattern>
 	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>default</servlet-name>
+		<url-pattern>/smarteditor2/**</url-pattern>
+	</servlet-mapping>
 
 	<!-- 시큐리티 필터 등록 -->
 	<filter>

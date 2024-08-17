@@ -2,26 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="community.board.service.BoardDAO">
 
-
-<!-- <resultMap type="BoardVO" id="board"> -->
-<!-- 	<result property="boardId" column="BOARD_ID"/> -->
-<!-- 	<result property="category" column="CATEGORY"/> -->
-<!-- 	<result property="boardSj" column="BOARD_SJ"/> -->
-<!-- 	<result property="boardCn" column="BOARD_CN"/> -->
-<!-- 	<result property="inqireCo" column="INQIRE_CO"/> -->
-<!-- 	<result property="recommendCnt" column="RECOMMEND_CNT"/> -->
-<!-- 	<result property="creatIp" column="CREAT_IP"/> -->
-<!-- 	<result property="isNotice" column="IS_NOTICE"/> -->
-<!-- 	<result property="othbcAt" column="OTHBC_AT"/> -->
-<!-- 	<result property="useAt" column="USE_AT"/> -->
-<!-- 	<result property="atchFileId" column="ATCH_FILE_ID"/> -->
-<!-- 	<result property="frstRegistPnttm" column="FRST_REGIST_PNTTM"/> -->
-<!-- 	<result property="registerId" column="REGISTER_ID"/> -->
-<!-- 	<result property="lastUpdtPnttm" column="LAST_UPDT_PNTTM"/> -->
-<!-- 	<result property="nickname" column="NICKNAME"/> -->
-<!-- </resultMap> -->
-
-
 <!-- 게시글 목록 조건절 -->
 <sql id="selectBoardListWhere">
 	<where>
@@ -31,6 +11,25 @@
 			AND A.IS_NOTICE = 'Y'
 		</when>
 		<otherwise>
+			<if test='category != null'>
+			<choose>
+				<when test='category == "-1"'>
+					AND A.RECOMMEND_CNT >= 3
+				</when>
+				<when test='category == "1"'>
+					AND A.CATEGORY = 1
+				</when>
+				<when test='category == "2"'>
+					AND A.CATEGORY = 2
+				</when>
+				<when test='category == "3"'>
+					AND A.CATEGORY = 3
+				</when>
+				<when test='category == "4"'>
+					AND A.CATEGORY = 4
+				</when>
+			</choose>
+			</if>
 			<if test='searchCondition != null and searchCondition !="" '>
 			<choose>
 				<when test='searchCondition == "0"'>
@@ -53,19 +52,21 @@
 <select id="selectBoardList" resultType="BoardVO">
 	SELECT 
 		A.BOARD_ID
+		, SUBSTRING(BOARD_ID, CHAR_LENGTH('BOARD_') + 1) AS BOARD_ID_NUM
 		, A.CATEGORY
 		, A.BOARD_SJ
-		, A.BOARD_CN
+		<!-- , A.BOARD_CN -->
 		, A.INQIRE_CO
 		, A.RECOMMEND_CNT
 		, A.CREAT_IP
 		, A.IS_NOTICE
 		, A.OTHBC_AT
 		, A.USE_AT
-		, A.ATCH_FILE_ID
+		<!-- , A.ATCH_FILE_ID -->
 		, A.FRST_REGIST_PNTTM
 		, A.REGISTER_ID
 		, B.NICKNAME
+		, (SELECT COUNT(*) FROM REPLY C WHERE A.BOARD_ID = C.BOARD_ID AND C.USE_AT = 'Y') AS REPLY_CNT
 	FROM BOARD A 
 		JOIN USERINFO B ON A.REGISTER_ID = B.USER_ID
 	<include refid="selectBoardListWhere"/>
@@ -86,7 +87,7 @@
 
 
 <!-- 게시글 조회수 증가 쿼리 -->
-<update id="updateViewCnt" parameterType="BoardVO">
+<update id="updateViewCnt">
 	UPDATE BOARD SET 
 			INQIRE_CO = INQIRE_CO+1 
 	WHERE BOARD_ID = #{boardId}
@@ -106,6 +107,7 @@
 		, ATCH_FILE_ID
 		, FRST_REGIST_PNTTM
 		, REGISTER_ID
+		, LAST_UPDT_PNTTM
 		, RECOMMEND_CNT
 		, IS_NOTICE
 		, NICKNAME
@@ -116,7 +118,7 @@
 </select>
 
 <!-- 마지막 게시글 번호 조회 쿼리 -->
-<select id="selectLastBoardId">
+<select id="selectLastBoardId" resultType="java.lang.String">
 	SELECT 
 		MAX(BOARD_ID) 
 	FROM board

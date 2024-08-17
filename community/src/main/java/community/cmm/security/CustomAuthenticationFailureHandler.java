@@ -24,17 +24,17 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
 
 	/** 로그인 실패 처리 */
 	@Override
-	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
+	public void onAuthenticationFailure(HttpServletRequest req, HttpServletResponse resp, AuthenticationException e) throws IOException, ServletException {
 		String errorMessage;
 		if (e instanceof BadCredentialsException || e instanceof InternalAuthenticationServiceException || e instanceof UsernameNotFoundException)
 			errorMessage = "아이디 또는 비밀번호가 맞지 않습니다.";
 		else
 			errorMessage = "로그인 중 문제가 발생했습니다.";
 
-		HttpSession session = request.getSession();
+		HttpSession session = req.getSession();
 		session.setAttribute("errorMessage", errorMessage);
 		setDefaultFailureUrl("/user/login");
-		super.onAuthenticationFailure(request, response, e);
+		super.onAuthenticationFailure(req, resp, e);
 	}
 
 }

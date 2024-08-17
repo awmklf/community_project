@@ -1,6 +1,5 @@
 package community.board.service;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import community.cmm.pagination.ComPageVO;
@@ -9,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class BoardVO extends ComPageVO implements Serializable {
+public class BoardVO extends ComPageVO {
 	private static final long serialVersionUID = 1L;
 
 	/** 게시글 ID */
@@ -41,6 +40,8 @@ public class BoardVO extends ComPageVO implements Serializable {
 	/** 게시글 공지영역 등록여부 */
 	private String isNotice;
 
+	/** 게시글 ID번호 */
+	private Integer boardIdNum;
 	/** 게시글 작성자 닉네임 */
 	private String nickname;
 	/** 현재 유저 아이디 */
@@ -53,9 +54,7 @@ public class BoardVO extends ComPageVO implements Serializable {
 	private String triggerViewCntUp;
 	/** 유저의 게시글 추천 수 */
 	private int numRecommendations;
-
-	public void setCreatIp(String creatIp) {
-		this.creatIp = creatIp;
-	}
+	/** 덧글 수 */
+	private int replyCnt;
 
 }
