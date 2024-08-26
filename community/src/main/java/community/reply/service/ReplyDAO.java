@@ -12,6 +12,9 @@ public interface ReplyDAO {
 	/** 덧글 개수 조회 */
 	public int selectReplyListCnt(String boardId) throws Exception;
 	
+	/** 덧글 표시 개수 조회 */
+	public int selectReplyViewCnt(String boardId) throws Exception;
+	
 	/** 덧글 조회 */
 	public ReplyVO selectReply(ReplyVO vo) throws Exception;
 

@@ -11,6 +11,18 @@
 	<sec:authentication property="principal" var="principal"/>
 </sec:authorize>
 
+<%-- 덧글 목록 수 영역 --%>
+<div>
+	<select id="selectRecord">
+		<option value="1">1개</option>
+		<option value="10" selected>10개</option>
+		<option value="30">30개</option>
+		<option value="50">50개</option>
+		<option value="100">100개</option>
+	</select>
+</div>
+
+<%-- 덧글영역 --%>
 <div>
 	<div id="replyCnt"></div>
 	<div id="replyList">
@@ -23,7 +35,7 @@
 	</sec:authorize>
 </div>
 
-
+<%-- 덧글 내용 템플릿 --%>
 <template id="viewReplyTemplate">
     <div class="reply" id="">
         <div><strong class="nickname"></strong> | <span class="frstRegistPnttm"></span></div>
@@ -37,31 +49,53 @@
     </div>
 </template>
 
+<%-- 수정&답글 작성창 템플릿 --%>
 <template id="replyRegistTemplate">
 	<div class="reply-form">
 		<textarea rows="5" cols="50" maxlength="1000" class="replyContent" id="" placeholder="답글 내용 입력"></textarea>
 		<button class="btn-submitRep" data-reply-id="${replyId}">작성</button>
 	</div>
 </template>
+
+
 <script>
 	$(document).ready(function() {
 		var token = $("meta[name='_csrf']").attr("content");
 		var header = $("meta[name='_csrf_header']").attr("content");
-		var boardIdNum = $("#boardIdNum").val();
+		var boardIdNum = $("#boardIdNum").val(); // 글번호
+		var pageUnit = $('#selectRecord').val(); // 페이지당 덧글수
+		var currPageIndex; // 현재 페이지
+		var lastPageIndex; // 마지막 페이지
+		var repCntPerPage; // 페이지 덧글수
+		
 		
 		// 덧글 목록 조회 실행
-		viewReplyList();
+		viewReplyList(1);
+		
+		// 페이지당 덧글수 변경
+		$('#selectRecord').change(function() {
+			pageUnit = $(this).val();
+			viewReplyList(1);
+		});
+
+		$('#btn-addRep').click(addReply); // 덧글 등록 버튼 이벤트
 		
 		// 덧글 목록 조회
-		function viewReplyList() {
-	    	$.ajax({
+		async function viewReplyList(pageIndex) {
+	    	await $.ajax({
 	    		url: '/reply/list/' + boardIdNum,
 	    		type: 'get',
+	    		data: {
+	    			pageIndex: pageIndex,
+	    			pageUnit: pageUnit
+	    		},
 	    		success: function (data) {
+	    			repCntPerPage = 0;
 	    			var replyList = $('#replyList');
     	            replyList.empty();
-					$('#replyCnt').text('덧글 : ' + data.totRepListCnt);
+					$('#replyCnt').text('덧글 : ' + data.pagination.replyListCnt);
     	            data.RepList.forEach(function(reply) {
+    	            	repCntPerPage++;
     	            	var updatedRep = '';
     	            	var replyViewTemplate = $('#viewReplyTemplate').contents().clone(); // 템플릿 복제
                         if (reply.parentReplyId) { // 덧글에 대한 답글인 경우
@@ -94,15 +128,26 @@
     	                replyList.append(replyViewTemplate); // 복제된 템플릿 추가
     	            });
     	            
-					$('.btn-editRepForm').click(function() { // 수정 버튼 이벤트
+					$('.btn-editRepForm').click(function() { // 수정창 띄우기 이벤트
 						replyForm.call(this);
    	                });
    	                $('.btn-delRep').click(function() { // 삭제 버튼 이벤트
    	                	delReply.call(this);
    	                });
-   	                $('.btn-addChildRepForm').click(function() { // 답글 작성 버튼 이벤트
+   	                $('.btn-addChildRepForm').click(function() { // 답글 작성창 띄우기 이벤트
    	                	replyForm.call(this);
    	                });
+   	                
+   	          		// 페이지네이션 추가
+					if (data.pagination.replyListCnt > 0) {
+	    	            var repPg = replyPagination(data.pagination);
+	    	            replyList.append(repPg);
+	   	                
+		   	            $('[data-page-index]').click(function (event) { // 덧글 페이지 이동 이벤트
+		   	            	event.preventDefault();
+		   	            	paClick.call(this);
+		   				});
+					}
 	    		},
 	    		error: function (xhr, status, error) {
 	                console.error(error);
@@ -111,8 +156,46 @@
 	    	});
 	    }
 		
-   		$('#btn-addRep').click(addReply); // 덧글 작성 버튼 이벤트
+		// 덧글 페이지네이션
+		function replyPagination(pg) {
+			var content = '<div>';
+			// 처음
+			if (pg.firstPageNoOnPageList > 1) {
+				content += '<a href="#" data-page-index="1">처음</a> ';
+			}
+			// 이전
+			if (pg.currentPageNo > 1) {
+				content += '<a href="#" data-page-index="' + pg.prevPage + '">이전</a> ';
+			}
+			// 번호
+			for (var pageNum = pg.firstPageNoOnPageList; pageNum <= pg.lastPageNoOnPageList; pageNum++) {
+				if (pageNum == pg.currentPageNo) {
+					content += '<span><b>'+pageNum+'</b></span> ';
+				} else {
+					content += '<a href="#" data-page-index="' + pageNum + '">'+pageNum+'</a> ';
+				}
+			}
+			// 다음
+			if (pg.currentPageNo < pg.totalPageCount) {
+				content += '<a href="#" data-page-index="' + pg.nextPage + '">다음</a> ';
+			}
+			// 마지막
+			if (pg.lastPageNoOnPageList < pg.totalPageCount) {
+				content += '<a href="#" data-page-index="' + pg.totalPageCount + '">마지막</a>';
+			}
+			content += '</div>'
+			
+			currPageIndex = pg.currentPageNo;
+			lastPageIndex = pg.totalPageCount;
+// 			console.log(pg);
+			return content;
+		}
 
+		// 덧글 페이지 이동
+		function paClick() {
+			var pgIdx = $(this).data('page-index');
+			viewReplyList(pgIdx);
+		}
 		
 		// 답글or수정창 띄우기
 		function replyForm () {
@@ -124,6 +207,7 @@
 			editReplyTemplate.find('.btn-submitRep').attr('data-reply-id', replyId);
 			if (btnClass == 'btn-editRepForm') { // 수정인 경우
 				var replyCn = $('#' + replyId).find('.replyCn').text();
+				editReplyTemplate.find('.replyContent').attr('placeholder', '수정할 내용 입력');
 				editReplyTemplate.find('.replyContent').text(replyCn);
 				editReplyTemplate.find('.btn-submitRep').text('수정');
 			}
@@ -145,6 +229,7 @@
 			var btnClass = $(this).attr('class');
 			var parentReplyId;
 			var replyContent;
+
 			if (btnClass == 'btn-submitRep') { // 답글 등록
 				parentReplyId = $(this).data('reply-id');
 				replyContent = $('#replyContent_' + parentReplyId).val();
@@ -160,6 +245,7 @@
 					return false;
 				}
 			}
+
 			$.ajax({
 				url: '/reply/' + boardIdNum + '/add',
 				type: 'post',
@@ -171,10 +257,12 @@
 					xhr.setRequestHeader(header, token);
 					xhr.setRequestHeader("Accept", "application/json");
 				},
-				success: function(response) {
+				success: async function(response) {
 					if (response.addRepCnt == 1) {
-						viewReplyList();
+// 						viewReplyList(pgidx);
 						$('#replyContent').val('');
+						await viewReplyList(lastPageIndex); // 마지막 페이지 갱신용
+						viewReplyList(lastPageIndex);
 					} else {
 						alert('정상적으로 반영되지 않았습니다.');
 					}
@@ -211,7 +299,7 @@
 				},
 				success: function(response) {
 					if (response.editReplyCnt == 1) {
-						viewReplyList();
+						viewReplyList(currPageIndex);
 					} else {
 						alert('정상적으로 반영되지 않았습니다.');
 					}
@@ -246,7 +334,11 @@
 				},
 				success: function(response) {
 					if (response.delReplyCnt == 1) {
-						viewReplyList();
+						if (currPageIndex == lastPageIndex && repCntPerPage == 1) {
+							viewReplyList(currPageIndex-1);
+						} else {
+							viewReplyList(currPageIndex);
+						}
 					} else {
 						alert('정상적으로 반영되지 않았습니다.');
 					}

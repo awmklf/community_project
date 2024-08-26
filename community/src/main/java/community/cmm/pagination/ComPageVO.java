@@ -29,7 +29,7 @@ public class ComPageVO implements Serializable {
     private int pageUnit = 10;
 
     /** 페이지 리스트 내 페이지 개수 */
-    private int pageSize = 2; // 테스트를 위해 2로 설정
+    private int pageSize = 10;
 
     /** firstIndex(쿼리용) */
     private int firstIndex = 1;

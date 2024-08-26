@@ -44,6 +44,10 @@ public class ReplyVO extends ComPageVO {
 	private String hasChildRep;
 	/** 덧글 계층 */
 	private int depth;
+	/** 실제 덧글 수 */
+	private int replyListCnt;
+	/** 표시 덧글 수 */
+	private int replyViewCnt;
 	/** 현재 유저 아이디 */
 	private String userId;
 	/** 현재 유저 아이피 */

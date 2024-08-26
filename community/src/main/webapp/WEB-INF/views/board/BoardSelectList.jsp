@@ -185,14 +185,14 @@
 	<%-- 페이징 영역 --%>
 	<div id="paging">
 		<%-- 처음 --%>
-		<c:if test="${paginationInfo.firstPageNoOnPageList != 1}">
+		<c:if test="${paginationInfo.firstPageNoOnPageList > 1}">
 			<c:url var="firstPageUrl" value="/board${_BASE_PARAM}">
 				<c:param name="pageIndex" value="1"/>
 			</c:url>
 			<a href="${firstPageUrl}">처음</a>
 		</c:if>
 		<%-- 이전 --%>
-		<c:if test="${paginationInfo.currentPageNo !=1}">
+		<c:if test="${paginationInfo.currentPageNo > 1}">
 			<c:url var="prevPageUrl" value="/board${_BASE_PARAM}">
 				<c:param name="pageIndex" value="${paginationInfo.prevPage}"/>
 			</c:url>
@@ -202,7 +202,7 @@
 		<c:forEach var="pageNum" begin="${paginationInfo.firstPageNoOnPageList}" end="${paginationInfo.lastPageNoOnPageList}">
 			<c:choose>
 				<c:when test="${pageNum == paginationInfo.currentPageNo}">
-					<span>${pageNum}</span>
+					<span><b>${pageNum}</b></span>
 				</c:when>
 				<c:otherwise>
 					<c:url var="pageUrl" value="/board${_BASE_PARAM}">
@@ -213,14 +213,14 @@
 			</c:choose>
 		</c:forEach>
 		<%-- 다음 --%>
-		<c:if test="${paginationInfo.currentPageNo != paginationInfo.totalPageCount}"> 
+		<c:if test="${paginationInfo.currentPageNo < paginationInfo.totalPageCount}"> 
 			<c:url var="nextPageUrl" value="/board${_BASE_PARAM}">
 				<c:param name="pageIndex" value="${paginationInfo.nextPage}"/>
 			</c:url>
 			<a href="${nextPageUrl}">다음</a>
 		</c:if>
 		<%-- 마지막 --%>
-		<c:if test="${paginationInfo.lastPageNoOnPageList != paginationInfo.totalPageCount}">
+		<c:if test="${paginationInfo.lastPageNoOnPageList < paginationInfo.totalPageCount}">
 			<c:url var="lastPageUrl" value="/board${_BASE_PARAM}">
 				<c:param name="pageIndex" value="${paginationInfo.totalPageCount}"/>
 			</c:url>

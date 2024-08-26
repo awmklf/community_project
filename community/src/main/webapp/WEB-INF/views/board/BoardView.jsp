@@ -140,6 +140,12 @@
 		});
 		
 	});
+
+<c:if test="${not empty sessionScope.message}">
+	alert("<c:out value='${sessionScope.message}'/>");
+	<c:remove var="message" scope="session"/>
+</c:if>
+	
 </script>
 
 <!-- 푸터 -->

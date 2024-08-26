@@ -42,6 +42,10 @@ public class PaginationCalc {
 
 	/** 쿼리 페이지 마지막 rownum */
 	private int lastRecordIndex;
+	
+	/** 실제 덧글 수 (덧글에서사용) */
+	@Setter
+	private int replyListCnt;
 
 	/** 맨 처음 페이지 */
 	public int getFirstPageNo() {

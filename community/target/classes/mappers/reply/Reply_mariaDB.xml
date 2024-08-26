@@ -74,18 +74,57 @@ WITH RECURSIVE ReplyHierarchy AS (
 	    	ON RH.REGISTER_ID = C.USER_ID
 	    LEFT JOIN USERINFO D 
 	    	ON B.REGISTER_ID = D.USER_ID
+	WHERE 
+	    EXISTS (SELECT 1 
+	            FROM REPLY 
+	            WHERE PARENT_REPLY_ID = RH.REPLY_ID AND USE_AT = 'Y'
+	           ) OR RH.USE_AT = 'Y'
 	ORDER BY 
 		ROOT_REPLY
 		, FRST_REGIST_PNTTM
+	LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
 </select>
 
-<!-- 덧글 개수 조회 쿼리 -->
+<!-- 사용중인 덧글 개수 조회 쿼리 -->
 <select id="selectReplyListCnt" resultType="java.lang.Integer">
 	SELECT 
 	 	COUNT(*)
 	FROM REPLY 
 	WHERE BOARD_ID = #{boardId}
 		AND USE_AT = 'Y'
+</select>
+
+<!-- 표시되는 덧글 수 조회 쿼리 -->
+<select id="selectReplyViewCnt" resultType="java.lang.Integer">
+    WITH RECURSIVE ReplyHierarchy AS (
+        SELECT 
+            REPLY_ID
+            , PARENT_REPLY_ID
+            , BOARD_ID
+            , USE_AT
+        FROM REPLY
+        WHERE BOARD_ID = #{boardId} 
+            AND PARENT_REPLY_ID IS NULL
+        
+        UNION ALL
+        
+        SELECT 
+            A.REPLY_ID
+            , A.PARENT_REPLY_ID
+            , A.BOARD_ID
+            , A.USE_AT
+        FROM REPLY A
+            JOIN ReplyHierarchy RH 
+                ON A.PARENT_REPLY_ID = RH.REPLY_ID
+    )
+    SELECT  COUNT(*)
+    FROM ReplyHierarchy RH
+    WHERE 
+        EXISTS (
+        	SELECT 1 
+            FROM REPLY 
+            WHERE PARENT_REPLY_ID = RH.REPLY_ID AND USE_AT = 'Y'
+        ) OR RH.USE_AT = 'Y'
 </select>
 
 <!-- 덧글 조회 쿼리 -->
