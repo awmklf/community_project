@@ -261,8 +261,12 @@
 					if (response.addRepCnt == 1) {
 // 						viewReplyList(pgidx);
 						$('#replyContent').val('');
-						await viewReplyList(lastPageIndex); // 마지막 페이지 갱신용
-						viewReplyList(lastPageIndex);
+						if (btnClass == 'btn-submitRep') { // 답글 등록
+							viewReplyList(currPageIndex);
+						} else {
+							await viewReplyList(lastPageIndex); // 마지막 페이지 갱신용
+							viewReplyList(lastPageIndex);
+						}
 					} else {
 						alert('정상적으로 반영되지 않았습니다.');
 					}

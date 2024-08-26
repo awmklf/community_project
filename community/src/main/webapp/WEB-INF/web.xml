@@ -82,7 +82,7 @@
 	
 	<!-- 세션 타임아웃 설정 -->
 	<session-config>
-		<session-timeout>1</session-timeout>
+		<session-timeout>60</session-timeout>
 	</session-config>
 	
 	<!-- 서버 시작 로드 페이지 -->
