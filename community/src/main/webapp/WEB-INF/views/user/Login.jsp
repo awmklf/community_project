@@ -10,11 +10,30 @@
 <meta charset="UTF-8">
 <title>로그인 - 커뮤니티</title>
 <style>
-    div {
-		margin: 20px;
-		padding: 10px;
-		border: 1px solid #ccc;
-		background-color: #f9f9f9;
+	body {
+	    margin: 0;
+	    padding: 0;
+	    display: flex;
+	    justify-content: center;
+	}
+	.container {
+	    max-width: 1100px;
+	    width: 100%;
+	    padding: 20px;
+	    box-sizing: border-box;
+	    border: 0px;
+	    text-align: center;
+	}
+	div {
+			margin: 20px;
+			padding: 10px;
+			border: 1px solid #ccc;
+			background-color: #f9f9f9;
+	}
+	label {
+		display:inline-block;
+		text-align:right;
+		width:150px;
 	}
 	a {
 		text-decoration: none;
@@ -24,24 +43,26 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
+<div class="container">
+	<h2 style="margin: 0 auto;">로그인</h2>
 	<c:url var="url" value="/user"/>
-<div>
-	<form action="${url}/login" method="post" id="loginForm">
-		<label for="id">아이디 : </label>
-		<input type="text" name="userId" id="id">
-		<br>
-		<label for="pwd">비밀번호 : </label>
-		<input type="password" name="password" id="pwd">
-		<br>
-		<input type="submit" value="로그인">
-		<sec:csrfInput/>
-	</form>
+	<div>
+		<form action="${url}/login" method="post" id="loginForm">
+			<label for="id">아이디 : </label>
+			<input type="text" name="userId" id="id">
+			<br>
+			<label for="pwd">비밀번호 : </label>
+			<input type="password" name="password" id="pwd">
+			<br>
+			<input type="submit" value="로그인" style="margin: 10px;">
+			<sec:csrfInput/>
+		</form>
+	</div>
+	<div>
+	<a href="${url}/recoverPwd">비밀번호 찾기</a> | 
+	<a href="${url}/signup">회원가입</a>
+	</div>
 </div>
-<div>
-<a href="${url}/recoverPwd">비밀번호 찾기</a> | 
-<a href="${url}/signup">회원가입</a>
-</div>
-
 	
 <script>
 // 로그인 실패 메세지

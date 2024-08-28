@@ -245,6 +245,7 @@
 			//초기화	
 			files = ev.dataTransfer.files;
 			nCount = files.length;
+			console.log(files);
 						
 			if (!!files && nCount === 0){
 				//파일이 아닌, 웹페이지에서 이미지를 드래서 놓는 경우.
@@ -253,6 +254,7 @@
 			}
 			
 			for (var i = 0, j = nImageFileCount ; i < nCount ; i++){
+				console.log(files[i].type);
 				if (!rFilter.test(files[i].type)) {
 					alert("이미지파일 (jpg,gif,png,bmp)만 업로드 가능합니다.");
 				} else if(files[i].size > nMaxImageSize){
@@ -328,53 +330,82 @@
     
     /**
      * HTML5 DragAndDrop으로 사진을 추가하고, 확인버튼을 누른 경우에 동작한다.
+	 * 24.08.28 - async/await을 이용하여 파일 업로드 순차진행
      * @return
      */
-    function html5Upload() {	
+    async function html5Upload() {	
     	var tempFile,
     		sUploadURL;
     	
-    	sUploadURL= 'file_uploader_html5.php'; 	//upload URL
+    	sUploadURL= '/board/uploadImage'; 	//upload URL
     	
     	//파일을 하나씩 보내고, 결과를 받음.
     	for(var j=0, k=0; j < nImageInfoCnt; j++) {
-    		tempFile = htImageInfo['img'+j];
-    		try{
-	    		if(!!tempFile){
-	    			//Ajax통신하는 부분. 파일과 업로더할 url을 전달한다.
-	    			callAjaxForHTML5(tempFile,sUploadURL);
-	    			k += 1;
-	    		}
-	    	}catch(e){}
-    		tempFile = null;
+				tempFile = htImageInfo['img'+j];
+				console.log(tempFile);
+				try{
+					if(!!tempFile){
+						//Ajax통신하는 부분. 파일과 업로더할 url을 전달한다.
+						await callAjaxForHTML5(tempFile,sUploadURL);
+						k += 1;
+					}
+				}catch(e){}
+				tempFile = null;
+				
     	}
 	}
-    
+    // 24.08.28 - 업로드 작업을 Promise로 감싸서 순차진행
     function callAjaxForHTML5 (tempFile, sUploadURL){
-    	var oAjax = jindo.$Ajax(sUploadURL, {
-			type: 'xhr',
-			method : "post",
-			onload : function(res){ // 요청이 완료되면 실행될 콜백 함수
-				var sResString = res._response.responseText;
-				if (res.readyState() == 4) {
-					if(sResString.indexOf("NOTALLOW_") > -1){
-						var sFileName = sResString.replace("NOTALLOW_", "");
-						alert("이미지 파일(jpg,gif,png,bmp)만 업로드 하실 수 있습니다. ("+sFileName+")");
-					}else{
-						//성공 시에  responseText를 가지고 array로 만드는 부분.
-						makeArrayFromString(res._response.responseText);
+		return new Promise((resolve, reject) => {
+			var oAjax = jindo.$Ajax(sUploadURL, {
+				type: 'xhr',
+				method : "post",
+				onload : function(res){ // 요청이 완료되면 실행될 콜백 함수
+					var sResString = res._response.responseText;
+					if (res.readyState() == 4) {
+						if(sResString.indexOf("NOTALLOW_") > -1){
+							var sFileName = sResString.replace("NOTALLOW_", "");
+							alert("이미지 파일(jpg,gif,png,bmp)만 업로드 하실 수 있습니다. ("+sFileName+")");
+							reject(new Error('Invalid file type: ' + sFileName));
+						}else{
+							//성공 시에  responseText를 가지고 array로 만드는 부분.
+							makeArrayFromString(res._response.responseText);
+							resolve(res._response.responseText);
+						}
 					}
-				}
-			},
-			timeout : 3,
-			onerror :  jindo.$Fn(onAjaxError, this).bind()
+				},
+				timeout : 3,
+				onerror :  jindo.$Fn(onAjaxError, this).bind()
+			});
+			oAjax.header("contentType","multipart/form-data");
+			oAjax.header("file-name",encodeURIComponent(tempFile.name));
+			oAjax.header("file-size",tempFile.size);
+			oAjax.header("file-Type",tempFile.type);
+			oAjax.header(header, token); // CSRF 토큰 추가
+			oAjax.request(tempFile);
 		});
-		oAjax.header("contentType","multipart/form-data");
-		oAjax.header("file-name",encodeURIComponent(tempFile.name));
-		oAjax.header("file-size",tempFile.size);
-		oAjax.header("file-Type",tempFile.type);
-		oAjax.request(tempFile);
     }
+
+	// 스프링 시큐리티 토큰을 가져오기 위한 함수 추가
+	var token = '';
+	var header = '';
+	function getCsrfToken() {
+	    var xhr = new XMLHttpRequest();
+	    xhr.open('GET', '/csrf-token', true);
+	    xhr.onreadystatechange = function() {
+	        if (xhr.readyState === 4 && xhr.status === 200) {
+	            var response = JSON.parse(xhr.responseText);
+	            token = response.token;
+	            header = response.headerName;
+	            console.log('CSRF Token:', token);
+	            console.log('CSRF Header:', header);
+	        }
+	    };
+	    xhr.send();
+	}
+	document.addEventListener('DOMContentLoaded', function() {
+	        getCsrfToken();
+	});
     
     function makeArrayFromString(sResString){
     	var	aTemp = [],
@@ -387,13 +418,15 @@
  	    		return ;
  	    	}
  			aTemp = sResString.split("&");
-	    	for (var i = 0; i < aTemp.length ; i++){
-	    		if( !!aTemp[i] && aTemp[i] != "" && aTemp[i].indexOf("=") > 0){
-	    			aSubTemp = aTemp[i].split("=");
+	    	for (var i = aTemp.length; i > 0  ; i--){
+	    		if( !!aTemp[i-1] && aTemp[i-1] != "" && aTemp[i-1].indexOf("=") > 0){
+	    			aSubTemp = aTemp[i-1].split("=");
 	    			htTemp[aSubTemp[0]] = aSubTemp[1];
 	    		}
 	 		}
- 		}catch(e){}
+ 		}catch(e){
+			console.log(e);
+		}
  		
  		aResultleng = aResult.length;
     	aResult[aResultleng] = htTemp;

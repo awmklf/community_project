@@ -11,58 +11,85 @@
 <sec:csrfMetaTags/>
 <title>회원가입 - 커뮤니티</title>
 <style>
+	body {
+	    margin: 0;
+	    padding: 0;
+	    display: flex;
+	    justify-content: center;
+	}
+	.container {
+	    max-width: 1100px;
+	    width: 100%;
+	    padding: 20px;
+	    box-sizing: border-box;
+	    border: 0px;
+	    text-align: center;
+	}
 	div {
 			margin: 20px;
 			padding: 10px;
 			border: 1px solid #ccc;
 			background-color: #f9f9f9;
-		}
+	}
+	label {
+		display:inline-block;
+		text-align:right;
+		width:150px;
+	}
+	input {
+		width: 250px;
+		height: 30px;
+	}
+	#btn {
+		display: block; 
+   		margin: 0 auto;
+	}
 </style>
 </head>
 <body>
-<div>
-	<a href="/">HOME</a>
+<div class="container">
+	<div>
+		<a href="/">HOME</a>
+	</div>
+	<h2>회원가입</h2>
+	<div style="text-align: left;">
+		<c:url var="url" value="/user"/>
+		<form action="${url}/signup" method="post" id="signUpForm">
+			<label for="id">아이디 : </label>
+			<input type="text" name="userId" id="id" placeholder="아이디(5~20자의 영문 소문자, 숫자)" maxlength="20">
+			<span id="idGreenMsg" class="msg" style="display: none;">사용가능한 아이디입니다.</span>
+			<span id="idNullMsg" class="msg" style="display: none;">아이디를 입력해 주세요.</span>
+			<span id="idValidMsg" class="msg" style="display: none;">5~20자의 영문 소문자, 숫자만 사용 가능합니다.</span>
+			<span id="idDuplMsg" class="msg" style="display: none;">이미 사용중인 아이디입니다.</span>
+			<br>
+			<label for="nickname">닉네임 : </label>
+			<input type="text" name="nickname" id="nickname" placeholder="닉네임(2~10자의 한글, 영문, 숫자)" maxlength="10">
+			<span id="nicknameGreenMsg" class="msg" style="display: none;">사용 가능한 닉네임입니다.</span>
+			<span id="nicknameNullMsg" class="msg" style="display: none;">닉네임을 입력해 주세요.</span>
+			<span id="nicknameValidMsg" class="msg" style="display: none;">2~10자의 한글, 영문, 숫자만 사용 가능합니다.</span>
+			<span id="nicknameDuplMsg" class="msg" style="display: none;">이미 사용중인 닉네임입니다.</span>
+			<br>
+			<label for="pwd">비밀번호 : </label>
+			<input type="password" name="password" id="pwd" placeholder="비밀번호(8자리 이상)">
+			<button type="button" id="pwdToggleBtn">show/hide</button>
+			<span id="pwdGreenMsg" class="msg" style="display: none;">사용 가능한 비밀번호입니다.</span>
+			<span id="pwdNullMsg" class="msg" style="display: none;">비밀번호를 입력해 주세요.</span>
+			<span id="pwdValidMsg" class="msg" style="display: none;">8자리 미만, 연속된 동일 문자 4자 이상 사용 불가</span>
+			<br>
+			<label for="pwdHint">비밀번호 힌트 : </label>
+			<input type="text" name="passwordHint" id="pwdHint" placeholder="비밀번호 찾기 시 질문">
+			<span id="pwdHintNullMsg" class="msg" style="display: none;">비밀번호 찾기 질문을 입력해 주세요.</span>
+			<br>
+			<label for="pwdCnsr">비밀번호 답 : </label>
+			<input type="text" name="passwordCnsr" id="pwdCnsr" placeholder="비밀번호 찾기 시 답변">
+			<span id="pwdCnsrNullMsg" class="msg" style="display: none;">비밀번호 찾기 답변을 입력해 주세요.</span>
+			<br>
+			<button id="btn" type="submit" style="margin: 10px auto">가입</button>
+			<sec:csrfInput/>
+		</form>
+	</div>
 </div>
-<div>
-	회원가입
-</div>
-<div>
-	<c:url var="url" value="/user"/>
-	<form action="${url}/signup" method="post" id="signUpForm">
-		<label for="id">아이디 : </label>
-		<input type="text" name="userId" id="id" placeholder="아이디(5~20자의 영문 소문자, 숫자)" maxlength="20">
-		<span id="idGreenMsg" class="msg" style="display: none;">사용가능한 아이디입니다.</span>
-		<span id="idNullMsg" class="msg" style="display: none;">아이디를 입력해 주세요.</span>
-		<span id="idValidMsg" class="msg" style="display: none;">5~20자의 영문 소문자, 숫자만 사용 가능합니다.</span>
-		<span id="idDuplMsg" class="msg" style="display: none;">이미 사용중인 아이디입니다.</span>
-		<br>
-		<label for="nickname">닉네임 : </label>
-		<input type="text" name="nickname" id="nickname" placeholder="닉네임(2~10자의 한글, 영문, 숫자)" maxlength="10">
-		<span id="nicknameGreenMsg" class="msg" style="display: none;">사용 가능한 닉네임입니다.</span>
-		<span id="nicknameNullMsg" class="msg" style="display: none;">닉네임을 입력해 주세요.</span>
-		<span id="nicknameValidMsg" class="msg" style="display: none;">2~10자의 한글, 영문, 숫자만 사용 가능합니다.</span>
-		<span id="nicknameDuplMsg" class="msg" style="display: none;">이미 사용중인 닉네임입니다.</span>
-		<br>
-		<label for="pwd">비밀번호 : </label>
-		<input type="password" name="password" id="pwd" placeholder="비밀번호(8자리 이상)">
-		<button type="button" id="pwdToggleBtn">show/hide</button>
-		<span id="pwdGreenMsg" class="msg" style="display: none;">사용 가능한 비밀번호입니다.</span>
-		<span id="pwdNullMsg" class="msg" style="display: none;">비밀번호를 입력해 주세요.</span>
-		<span id="pwdValidMsg" class="msg" style="display: none;">비밀번호는 8자리 이상이어야 하며, 연속된 동일 문자 4자 이상 사용 불가능합니다.</span>
-		<br>
-		<label for="pwdHint">비밀번호 힌트 : </label>
-		<input type="text" name="passwordHint" id="pwdHint" placeholder="비밀번호 찾기 시 질문">
-		<span id="pwdHintNullMsg" class="msg" style="display: none;">비밀번호 찾기 질문을 입력해 주세요.</span>
-		<br>
-		<label for="pwdCnsr">비밀번호 답 : </label>
-		<input type="text" name="passwordCnsr" id="pwdCnsr" placeholder="비밀번호 찾기 시 답변">
-		<span id="pwdCnsrNullMsg" class="msg" style="display: none;">비밀번호 찾기 답변을 입력해 주세요.</span>
-		<br>
-		<button id="btn" type="submit">가입</button>
-		<sec:csrfInput/>
-	</form>
-</div>
-	
+
 <script src="/js/jquery-3.7.1.min.js"></script>
 <script>
 	$(document).ready(function(){

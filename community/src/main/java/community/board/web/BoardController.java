@@ -1,16 +1,24 @@
 package community.board.web;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +41,83 @@ public class BoardController {
 	/** commService DI */
 	@Autowired
 	CommonService cmmService;
+	
+
+	
+
+	// 파일 업로드를 처리하는 메소드
+    @PostMapping("/board/uploadImage")
+    public void uploadImage(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String fileSize = request.getHeader("file-size");
+        String fileType = request.getHeader("file-Type");
+    	
+    	// 파일 이름과 확장자 추출
+        String fileName = request.getHeader("file-name");
+        String fileNameSuffix = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        String[] suffixArr = {"jpg", "png", "bmp", "gif"};
+        
+        // 파일 확장자가 허용된 목록에 있는지 확인
+        int cnt = 0;
+        for (String suffix : suffixArr) {
+            if (fileNameSuffix.equals(suffix)) {
+                cnt++;
+                break;
+            }
+        }
+        
+        // 허용되지 않은 파일 확장자일 경우 에러 반환
+        if (cnt == 0) {
+            response.getWriter().println("NOTALLOW_" + fileName);
+            return;
+        }
+        
+        // 기본 경로 설정
+        String defaultPath = request.getSession().getServletContext().getRealPath("/");
+        String filePath = defaultPath + "resources" + File.separator + "img" + File.separator + "smarteditor2" + File.separator;
+        File file = new File(filePath);
+        
+        // 업로드 디렉토리가 없으면 생성
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        
+        // 새로운 파일 이름 생성
+        String autoFileName = UUID.randomUUID().toString() + fileName.substring(fileName.lastIndexOf("."));
+        String rFileName = filePath + autoFileName;
+        
+        // 파일을 업로드 디렉토리에 저장
+        try (InputStream is = request.getInputStream();
+             OutputStream os = new FileOutputStream(rFileName)) {
+            byte[] buffer = new byte[Integer.parseInt(request.getHeader("file-size"))];
+            int num;
+            while ((num = is.read(buffer)) != -1) {
+                os.write(buffer, 0, num);
+            }
+        }
+        
+        // 파일 정보 설정
+        String fileInfo = "&bNewLine=true";
+        fileInfo += "&sFileName=" + fileName;
+        fileInfo += "&sFileURL=/resources/img/smarteditor2/" + autoFileName;
+        // 파일 정보 반환
+        response.getWriter().println(fileInfo);
+        
+        System.out.println("==================================================="+fileName);
+    }
+	
+	
+	// 스마트 에디터 이미지 업로드를 위한 시큐리티 csrf 발행
+	@ResponseBody
+	@GetMapping("/csrf-token")
+    public Map<String, String> getCsrfToken(HttpServletRequest request) {
+        CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+        Map<String, String> tokenMap = new HashMap<>();
+        tokenMap.put("token", csrfToken.getToken());
+        tokenMap.put("headerName", csrfToken.getHeaderName());
+        return tokenMap;
+    }
+	
+	
 
 	/** 게시글 목록 조회 */
 	@RequestMapping("/board")

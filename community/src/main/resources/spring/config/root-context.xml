@@ -14,5 +14,5 @@
 	<context:component-scan base-package="community" >
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
 	</context:component-scan>
-
+	
 </beans>

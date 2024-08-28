@@ -20,7 +20,7 @@
 <input type="hidden" id="boardIdNum" value="<c:out value="${result.boardIdNum}"/>">
 <%-- 게시글 내용 영역 --%>
 <div>
-	<div> 
+	<div style="border: 0px;">
 		<c:choose>
 			<c:when test="${result.category == 1}">
 				<c:set var="categoryName" value="[일반]"/>
@@ -35,10 +35,12 @@
 				<c:set var="categoryName" value="[건의/신고]"/>
 			</c:when>
 		</c:choose>
+		<b>
 		<span><c:out value="${categoryName}"/></span>
 		<span><c:out value="${result.boardSj}"/></span>
+		</b>
 	</div>
-	<div>
+	<div style="border: 0px;">
 		작성자 : <span><c:out value="${result.nickname}"/></span> <br>
 		작성일 : <span><fmt:formatDate value="${result.frstRegistPnttm}" pattern="yyyy.MM.dd HH:mm:ss" /></span>
 		<c:if test="${not empty result.lastUpdtPnttm}">
@@ -48,16 +50,17 @@
 		조회수 : <span><c:out value="${result.inqireCo}"/></span> <br>
 		추천수 : <span class="recView"><c:out value="${result.recommendCnt}"/></span> <br>
 	</div>
-	<div>
+	<hr>
+	<div style="border: 0px;">
 		<span class="boardCn"><c:out value="${result.boardCn}" escapeXml="false"/></span>
 	</div>
-	<div>
+	<div style="border: 0px;">
 		<button type="button" id="btn-rec">추천</button>
 		<span id="rec-count" class="recView"><c:out value="${result.recommendCnt}"/></span>
 	</div>
 </div>
 <%-- 게시글 액션 영역 --%>
-<div>
+<div style="border: 0; text-align: left;">
 	<c:if test="${not empty searchVO.boardIdNum}">
 		<c:url var="udtUrl" value="/board/${searchVO.boardIdNum}/edit${_BASE_PARAM}"/>
 		<c:url var="delUrl" value="/board/${searchVO.boardIdNum}/delete${_BASE_PARAM}"/>

@@ -33,7 +33,7 @@
 	<form action="${actionUrl}" method="post" id="form" >
 		<input type="hidden" name="boardId" value="${result.boardId}">
 		<input type="hidden" name="registerId" value="${result.registerId}">
-		<div>
+		<div style="text-align: left;">
 			<select id="" name="category">
 				<option value="1" ${result.category eq '1' ? 'selected' : ''}>일반</option>
 				<option value="2" ${result.category eq '2' ? 'selected' : ''}>정보</option>
@@ -43,8 +43,8 @@
 			<input type="text" name="boardSj" id="boardSj" title="제목" class="" placeholder="제목" value="<c:out value="${result.boardSj}"/>">
 		</div>
 		<sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')">
-			<div>
-				공지여부
+			<div style="text-align: left;">
+				공지 여부&nbsp;
 				<label for="isNoticeY">예 : </label>
 				<input type="radio" id="isNoticeY" name="isNotice" value="Y" ${result.isNotice eq 'Y' ? 'checked' : ''}>
 				&nbsp;&nbsp;&nbsp;
@@ -52,8 +52,8 @@
 				<input type="radio" id="isNoticeN" name="isNotice" value="N" ${result.isNotice ne 'Y' ? 'checked' : ''}>
 			</div>
 		</sec:authorize>
-		<div id="privateSection" style="display: none;">
-			비공개 여부
+		<div id="privateSection" style="display: none; text-align: left;">
+			비공개 여부&nbsp;
 			<label for="othbcAtY">예 : </label>
 			<input type="radio" name="othbcAt" id="othbcAtY" value="Y" ${result.othbcAt eq 'Y' ? 'checked' : ''}>
 			&nbsp;&nbsp;&nbsp;
@@ -63,7 +63,7 @@
 		<div>
 			<!-- 에디터 -->
 			<script type="text/javascript" src="/resources/smarteditor2/js/HuskyEZCreator.js" charset="utf-8"></script>
-			<textarea id="boardCn" name="boardCn" cols="120" rows="30" title="내용입력" style="display: none;"><c:out value="${result.boardCn}"/></textarea>
+			<textarea id="boardCn" name="boardCn" cols="120" rows="30" title="내용입력" style="display: none; width: 100%;"><c:out value="${result.boardCn}"/></textarea>
 			<script id="smartEditor" type="text/javascript"> 
 				var oEditors = [];
 				nhn.husky.EZCreator.createInIFrame({
@@ -85,7 +85,7 @@
 				});
 			</script>
 		</div>
-		<div>
+		<div style="border: 0;">
 			<c:set var="btnText" value="등록"/>
 			<c:set var="cslUrl" value="/board${_BASE_PARAM}"/>
 			<c:choose>

@@ -17,54 +17,56 @@
 	<c:if test="${not empty searchVO.searchCondition}"><c:param name="searchCondition" value="${searchVO.searchCondition}"/></c:if>
 	<c:if test="${not empty searchVO.searchKeyword}"><c:param name="searchKeyword" value="${searchVO.searchKeyword}"/></c:if>
 </c:url>
-
-<%-- 게시글 목록 수 영역 --%>
-<div>
-	<form id="pageSizeForm" action="/board" method="post">
-		<input type="hidden" name="searchCondition" value="${searchVO.searchCondition}"/>
-		<input type="hidden" name="searchKeyword" value="${searchVO.searchKeyword}"/>
-		<select id="selectRecord" name="pageUnit">
-		
-			<%-- <option value="1" ${searchVO.recordCountPerPage eq '1' ? 'selected' : ''} >1개</option> --%>
-			<option value="10" ${searchVO.recordCountPerPage eq '10' ? 'selected' : ''} >10개</option>
-			<option value="30" ${searchVO.recordCountPerPage eq '30' ? 'selected' : ''} >30개</option>
-			<option value="50" ${searchVO.recordCountPerPage eq '50' ? 'selected' : ''} >50개</option>
-		</select>
-		<sec:csrfInput/>
-	</form>
+<div style="padding: 0; display: flex; justify-content: center;">
+	<%-- 게시글 목록 수 영역 --%>
+	<div style="border: 0px; margin: 0; margin-left: auto;">
+		<form id="pageSizeForm" action="/board" method="post">
+			<input type="hidden" name="searchCondition" value="${searchVO.searchCondition}"/>
+			<input type="hidden" name="searchKeyword" value="${searchVO.searchKeyword}"/>
+			<label for="selectRecord">게시글 표시</label>
+			<select id="selectRecord" name="pageUnit">
+			
+				<%-- <option value="1" ${searchVO.recordCountPerPage eq '1' ? 'selected' : ''} >1개</option> --%>
+				<option value="10" ${searchVO.recordCountPerPage eq '10' ? 'selected' : ''} >10개</option>
+				<option value="30" ${searchVO.recordCountPerPage eq '30' ? 'selected' : ''} >30개</option>
+				<option value="50" ${searchVO.recordCountPerPage eq '50' ? 'selected' : ''} >50개</option>
+			</select>
+			<sec:csrfInput/>
+		</form>
+	</div>
+	<!-- 게시글 카테고리 -->
+	<div style="border: 0px; text-align: center; margin: 0 auto; position: absolute">
+		<c:url var="allPost" value="/board"/>
+		<a href="${allPost}" class="${empty param.category ? 'active' : 'inactive'}" style="border: 0;">전체</a>
+		|
+		<c:url var="recommendPost" value="/board">
+			<c:param name="category" value="-1"/>
+		</c:url>
+		<a href="${recommendPost}" class="${param.category == -1 ? 'active' : 'inactive'}" style="border: 0;">추천</a>
+		|
+		<c:url var="generalPost" value="/board">
+			<c:param name="category" value="1"/>
+		</c:url>
+		<a href="${generalPost}" class="${param.category == 1 ? 'active' : 'inactive'}" style="border: 0;">일반</a>
+		|
+		<c:url var="infoPost" value="/board">
+			<c:param name="category" value="2"/>
+		</c:url>
+		<a href="${infoPost}" class="${param.category == 2 ? 'active' : 'inactive'}" style="border: 0;">정보</a>
+		|
+		<c:url var="questionPosts" value="/board">
+			<c:param name="category" value="3"/>
+		</c:url>
+		<a href="${questionPosts}" class="${param.category == 3 ? 'active' : 'inactive'}" style="border: 0;">질문</a>
+		|
+		<c:url var="suggestionReportPost" value="/board">
+			<c:param name="category" value="4"/>
+		</c:url>
+		<a href="${suggestionReportPost}" class="${param.category == 4 ? 'active' : 'inactive'}" style="border: 0;">건의/신고</a>
+	</div>
 </div>
 <!-- 게시글 영역 -->
 <div id="postList">
-<!-- 게시글 카테고리 -->
-<div>
-	<c:url var="allPost" value="/board"/>
-	<a href="${allPost}" class="${empty param.category ? 'active' : 'inactive'}">전체</a>
-	|
-	<c:url var="recommendPost" value="/board">
-		<c:param name="category" value="-1"/>
-	</c:url>
-	<a href="${recommendPost}" class="${param.category == -1 ? 'active' : 'inactive'}">추천</a>
-	|
-	<c:url var="generalPost" value="/board">
-		<c:param name="category" value="1"/>
-	</c:url>
-	<a href="${generalPost}" class="${param.category == 1 ? 'active' : 'inactive'}">일반</a>
-	|
-	<c:url var="infoPost" value="/board">
-		<c:param name="category" value="2"/>
-	</c:url>
-	<a href="${infoPost}" class="${param.category == 2 ? 'active' : 'inactive'}">정보</a>
-	|
-	<c:url var="questionPosts" value="/board">
-		<c:param name="category" value="3"/>
-	</c:url>
-	<a href="${questionPosts}" class="${param.category == 3 ? 'active' : 'inactive'}">질문</a>
-	|
-	<c:url var="suggestionReportPost" value="/board">
-		<c:param name="category" value="4"/>
-	</c:url>
-	<a href="${suggestionReportPost}" class="${param.category == 4 ? 'active' : 'inactive'}">건의/신고</a>
-</div>
 	<table>
 		<thead>
 			<tr>
@@ -84,11 +86,11 @@
 		<c:forEach var="result" items="${noticeResultList}" varStatus="status">
 			<tr class="notice">
 				<td class="num"><span class="label-bbs spot">공지</span></td>
-				<td class="tit">
+				<td class="tit" style="padding-left: 20px; text-align: left;">
 					<c:url var="viewUrl" value="/board/${result.boardIdNum}${_BASE_PARAM}">
 						<c:param name="pageIndex" value="${searchVO.pageIndex}"/>
 					</c:url>
-					<a href="${viewUrl}"><c:out value="${result.boardSj} [${result.replyCnt}]"/></a>
+					<a href="${viewUrl}" style="border: 0;"><c:out value="${result.boardSj} [${result.replyCnt}]"/></a>
 				</td>
 				<td class="writer" data-cell-header="작성자 : "><c:out value="${result.nickname}"/></td>
 				<td class="date" data-cell-header="작성일 : ">
@@ -109,14 +111,14 @@
 				</td>
 			</tr>
 		</c:forEach>
-		
+		<tr><td colspan="8"><hr></td></tr>
 		<!-- 일반글 영역 -->
 		<c:forEach var="result" items="${resultList}" varStatus="status">
 			<tr>
 				<td class="num">
 					<c:out value="${paginationInfo.totalRecordCount - ((searchVO.pageIndex-1) * searchVO.pageUnit) - (status.count - 1)}"/>
 				</td>
-				<td>
+				<td style="padding-left: 20px; text-align: left;">
 					<c:choose>
 						<c:when test="${result.category == 1}">
 							<c:set var="categoryName" value="[일반]"/>
@@ -134,10 +136,10 @@
 					<c:url var="viewUrl" value="/board/${result.boardIdNum}${_BASE_PARAM}">
 						<c:param name="pageIndex" value="${searchVO.pageIndex}"/>
 					</c:url>
-					<a href="${viewUrl}">
+					<a href="${viewUrl}" style="border: 0;">
 						<c:out value="${categoryName}"/> 
 						<c:if test="${result.othbcAt eq 'Y'}">
-							<img alt="비밀글 아이콘" src="">
+							<img alt="비밀글 아이콘" src="/img/ico_board_lock.gif">
 						</c:if>
 						<c:out value="${result.boardSj} [${result.replyCnt}]"/>
 					</a>
@@ -181,9 +183,9 @@
 	</table>
 </div>
 
-<div>
+<div style="padding: 0; display: flex; justify-content: center;">
 	<%-- 페이징 영역 --%>
-	<div id="paging">
+	<div id="paging" style="border: 0px; margin: 0 auto; align-items: center; position: absolute;">
 		<%-- 처음 --%>
 		<c:if test="${paginationInfo.firstPageNoOnPageList > 1}">
 			<c:url var="firstPageUrl" value="/board${_BASE_PARAM}">
@@ -229,7 +231,7 @@
 	</div>
 	
 	
-	<div>
+	<div style=" border: 0px; margin: 0; margin-left: auto;">
 		<c:url var="postUrl" value="/board/write${_BASE_PARAM}"/>
 		<a href="${postUrl}">글쓰기</a>
 	</div>

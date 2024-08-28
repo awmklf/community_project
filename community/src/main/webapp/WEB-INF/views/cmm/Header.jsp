@@ -11,12 +11,26 @@
 <sec:csrfMetaTags/>
 <title>${param.title}</title>
 <style>
+	 body {
+	    margin: 0;
+	    padding: 0;
+	    display: flex;
+	    justify-content: center;
+	}
+	.container {
+	    max-width: 1100px;
+	    width: 100%;
+	    padding: 20px;
+	    box-sizing: border-box;
+	    border: 0px;
+	}
 	table {
 		width: 100%;
 		border-collapse: collapse;
 	}
 	th, td {
 		padding: 10px;
+		text-align: center;
 	}
 	thead {
 		background-color: #f2f2f2;
@@ -29,6 +43,7 @@
 		padding: 10px;
 		border: 1px solid #ccc;
 		background-color: #f9f9f9;
+		text-align: center;
 	}
 	.boardCn div {
 		margin: 0px;
@@ -39,6 +54,11 @@
 	a {
 		text-decoration: none;
 		color: black;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+	}
+	a:hover {
+	    color: gray;
 	}
 	
 	.reply-indent {
@@ -53,26 +73,22 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
+	<div class="container">
+	<h1 style="margin-top: 5px; margin-bottom: 30px;">COMMUNITY</h1>
 	<header class="">
 		<div class="">
-			<div class="">
-				<ul>
-					<li><a href="/">HOME</a></li>
-					<c:choose>
-						<c:when test="${empty userId}">
-							<li><a href="/user/login">로그인</a></li>
-						</c:when>
-						<c:otherwise>
-							<li><strong><c:out value="${nickname}"/></strong>님 환영합니다</li>
-							<form id="logoutForm" method="POST" action="/user/logout">
-								<sec:csrfInput/>
-							</form>
-							<li>
-							<a href="#" onclick="document.getElementById('logoutForm').submit();">로그아웃</a>
-							</li>
-						</c:otherwise>
-					</c:choose>
-				</ul>
-			</div>
+			<a href="/">HOME</a> |
+			<c:choose>
+				<c:when test="${empty userId}">
+					<a href="/user/login">로그인</a>
+				</c:when>
+				<c:otherwise>
+					<strong><c:out value="${nickname}"/></strong>님 환영합니다 |
+					<a href="#" onclick="document.getElementById('logoutForm').submit();">로그아웃</a>
+					<form id="logoutForm" method="POST" action="/user/logout" style="display: none;">
+						<sec:csrfInput/>
+					</form>
+				</c:otherwise>
+			</c:choose>
 		</div>
 	</header>

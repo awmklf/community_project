@@ -11,33 +11,48 @@
 <sec:csrfMetaTags/>
 <title>비밀번호 변경 - 커뮤니티</title>
 <style type="text/css">
+	body {
+	    margin: 0;
+	    padding: 0;
+	    display: flex;
+	    justify-content: center;
+	}
+	.container {
+	    max-width: 600px;
+	    width: 100%;
+	    padding: 20px;
+	    box-sizing: border-box;
+	    border: 0px;
+	    text-align: center;
+	}
 	.msg {
 		display: none;
 	}
 </style>
 </head>
 <body>
-<c:url var="url" value="/user"/>
-<div>
-	<a href="/">HOME</a>
+<div class="container">
+	<c:url var="url" value="/user"/>
+	<div>
+		<a href="/">HOME</a>
+	</div>
+	<div>
+		비밀번호 변경
+		<form action="${url}/changePwd" method="post" id="changePwdForm">
+			<input type="hidden" name="userId" value="<c:out value="${userId}"/>">
+			<input type="hidden" name="allowPwdChange" id="allowPwdChange">
+			<label for="pwd">변경할 비밀번호 : </label>
+			<input type="password" name="password" id="pwd" placeholder="비밀번호(8자리 이상)">
+			<button type="button" id="pwdToggleBtn">show/hide</button>
+			<span id="pwdGreenMsg" class="msg">사용 가능한 비밀번호입니다.</span>
+			<span id="pwdNullMsg" class="msg">비밀번호를 입력해 주세요.</span>
+			<span id="pwdValidMsg" class="msg">8자리 이상만 사용 가능합니다.</span>
+			<br>
+			<button type="submit">변경</button>
+			<sec:csrfInput/>
+		</form>
+	</div>
 </div>
-<div>
-	비밀번호 변경
-	<form action="${url}/changePwd" method="post" id="changePwdForm">
-		<input type="hidden" name="userId" value="<c:out value="${userId}"/>">
-		<input type="hidden" name="allowPwdChange" id="allowPwdChange">
-		<label for="pwd">변경할 비밀번호 : </label>
-		<input type="password" name="password" id="pwd" placeholder="비밀번호(8자리 이상)">
-		<button type="button" id="pwdToggleBtn">show/hide</button>
-		<span id="pwdGreenMsg" class="msg">사용 가능한 비밀번호입니다.</span>
-		<span id="pwdNullMsg" class="msg">비밀번호를 입력해 주세요.</span>
-		<span id="pwdValidMsg" class="msg">8자리 이상만 사용 가능합니다.</span>
-		<br>
-		<button type="submit">변경</button>
-		<sec:csrfInput/>
-	</form>
-</div>
-
 <script src="/js/jquery-3.7.1.min.js"></script>
 	<script>
 		$(document).ready(function(){

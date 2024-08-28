@@ -11,25 +11,30 @@
 	<sec:authentication property="principal" var="principal"/>
 </sec:authorize>
 
-<%-- 덧글 목록 수 영역 --%>
-<div>
-	<select id="selectRecord">
-		<option value="1">1개</option>
-		<option value="10" selected>10개</option>
-		<option value="30">30개</option>
-		<option value="50">50개</option>
-		<option value="100">100개</option>
-	</select>
+<div style="padding: 5px; display: flex; justify-content: space-between;">
+	<%-- 덧글 개수 영역 --%>
+	<div id="replyCnt" style="border: 0px; margin: 0;"></div>
+	<%-- 덧글 목록 수 영역 --%>
+	<div style="border: 0px; text-align: center; margin: 0;">
+		<label for="selectRecord">덧글 목록 표시</label>
+		<select id="selectRecord">
+			<option value="1">1개</option>
+			<option value="10" selected>10개</option>
+			<option value="30">30개</option>
+			<option value="50">50개</option>
+			<option value="100">100개</option>
+		</select>
+	</div>
 </div>
 
-<%-- 덧글영역 --%>
+
 <div>
-	<div id="replyCnt"></div>
-	<div id="replyList">
+	<%-- 덧글영역 --%>
+	<div id="replyList" style="border: 0px; margin: 0;">
 	</div>
 	<sec:authorize access="isAuthenticated()">
-		<div id="reply">
-			<textarea rows="5" cols="50" id="replyContent" maxlength="1000" placeholder="덧글 내용 입력"></textarea>
+		<div id="reply" style="text-align: left; border: 0px; margin: 0; margin-left: 10px;">
+			<textarea rows="5" cols="100" id="replyContent" maxlength="1000" placeholder="덧글 내용 입력"></textarea>
 			<button id="btn-addRep">작성</button>
 		</div>
 	</sec:authorize>
@@ -37,23 +42,27 @@
 
 <%-- 덧글 내용 템플릿 --%>
 <template id="viewReplyTemplate">
-    <div class="reply" id="">
-        <div><strong class="nickname"></strong> | <span class="frstRegistPnttm"></span></div>
-        <div class="parentReply"><strong class="parentNickname"></strong>님에게 답글</div>
-        <div class="replyCn"></div>
-        <sec:authorize access="isAuthenticated()">
-			<button class="btn-editRepForm" data-reply-id="">수정</button>
-       		<button class="btn-delRep" data-reply-id="">삭제</button>
-        	<button class="btn-addChildRepForm" data-reply-id="">답글</button>
-        </sec:authorize>
+    <div class="reply" id="" style="text-align: left;">
+        <div style="text-align: left; border: 0px; margin: 0;"><strong class="nickname"></strong> | <span class="frstRegistPnttm"></span></div>
+        <hr>
+        <div class="parentReply" style="text-align: left; border: 0px; margin: 0;"><strong class="parentNickname"></strong>님에게 답글</div>
+        <div class="replyCn" style="text-align: left; border: 0px; margin: 0;"></div>
+        <div style="text-align: right; border: 0px; margin: 0; margin-left: auto;">
+	        <sec:authorize access="isAuthenticated()">
+				<button class="btn-editRepForm" data-reply-id="">수정</button>
+	       		<button class="btn-delRep" data-reply-id="">삭제</button>
+	        	<button class="btn-addChildRepForm" data-reply-id="">답글</button>
+	        </sec:authorize>
+        </div>
     </div>
 </template>
 
 <%-- 수정&답글 작성창 템플릿 --%>
 <template id="replyRegistTemplate">
-	<div class="reply-form">
-		<textarea rows="5" cols="50" maxlength="1000" class="replyContent" id="" placeholder="답글 내용 입력"></textarea>
-		<button class="btn-submitRep" data-reply-id="${replyId}">작성</button>
+	<div class="reply-form" style="text-align: left; border: 0px; margin: 0; margin-left: 10px;">
+		<hr>
+		<textarea rows="5" cols="100" maxlength="1000" class="replyContent" id="" placeholder="답글 내용 입력"></textarea>
+		<button class="btn-submitRep" data-reply-id="${replyId}" style="margin-left: auto;">작성</button>
 	</div>
 </template>
 

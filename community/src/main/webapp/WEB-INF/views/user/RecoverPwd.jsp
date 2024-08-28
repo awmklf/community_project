@@ -11,63 +11,83 @@
 <sec:csrfMetaTags/>
 <title>비밀번호 변경 - 커뮤니티</title>
 <style>
+	body {
+	    margin: 0;
+	    padding: 0;
+	    display: flex;
+	    justify-content: center;
+	}
+	.container {
+	    max-width: 1100px;
+	    width: 100%;
+	    padding: 20px;
+	    box-sizing: border-box;
+	    border: 0px;
+	    text-align: center;
+	}
 	div {
 			margin: 20px;
 			padding: 10px;
 			border: 1px solid #ccc;
 			background-color: #f9f9f9;
-		}
+	}
+	label {
+		display:inline-block;
+		text-align:center;
+	}
 </style>
 </head>
 <body>
-<c:url var="url" value="/user"/>
-
-<div>
-	<a href="/">HOME</a>
-</div>
-<div>
-	비밀번호 찾기
-</div>
-<!-- 아이디 조회 영역 -->
-<div id="findById_Box">
-	<p>비밀번호를 찾기 위해 아이디를 입력해 주세요.</p>
-	<label for="id">아이디 : </label>
-	<input type="text" name="userId" id="id">
-	<span id="idNullMsg" style="display: none;">아이디를 입력해주세요.</span>
-	<span id="notFound" style="display: none;">유효하지 않은 아이디입니다.</span> <br>
-	<button type="button" id="btn">아이디 확인 </button>
-</div>
-
-<!-- 비밀번호 답변 영역 -->
-<div id="pwdQnA_Box" style="display: none;">
-	<p>비밀번호 힌트에 대한 답변을 입력해 주세요.</p>
-	<label for="passwordHint">비밀번호 힌트 : </label>
-	<input type="text" name="passwordHint" id="passwordHint" value="" readonly="readonly"> <br>
-	<label for="passwordCnsr">비밀번호 답변 : </label>
-	<input type="text" name="passwordCnsr" id="passwordCnsr">
-	<span id="incorrectPwdCnsr" style="display: none;">답변이 올바르지 않습니다.</span>
-	<span id="nullPwdCnsr" style="display: none;">답변을 입력해 주세요.</span> <br>
-	<button type="buton" id="btn_pwdQnA">확인</button>
-</div>
-
-
-<!-- 비밀번호 변경 영역 -->
-<div id="changePwd_Box" style="display: none;">
-	<p>변경할 비밀번호를 입력해 주세요.</p>
-	<form action="${url}/changePwd" method="post" id="changePwdForm">
-		<input type="hidden" name="userId" id="hiddenUserId" readonly="readonly">
-		<input type="hidden" name="allowPwdChange" id="allowPwdChange" readonly="readonly">
-		<label for="pwd">변경할 비밀번호 : </label>
-		<input type="password" name="password" id="pwd" placeholder="비밀번호(8자리 이상)">
-		<button type="button" id="pwdToggleBtn">show/hide</button>
-		<span id="pwdNullMsg" class="msg" style="display: none;">비밀번호를 입력해 주세요.</span>
-		<span id="pwdValidMsg" class="msg" style="display: none;">비밀번호는 8자리 이상이어야 하며, 연속된 동일 문자 4자 이상 사용 불가능합니다.</span>
+<div class="container">
+	<c:url var="url" value="/user"/>
+	
+	<div>
+		<a href="/">HOME</a>
+	</div>
+	<h2>비밀번호 찾기</h2>
+	<!-- 아이디 조회 영역 -->
+	<div id="findById_Box">
+		<p>비밀번호를 찾기 위해 아이디를 입력해 주세요.</p>
+		<label for="id">아이디 : </label>
+		<input type="text" name="userId" id="id">
 		<br>
-		<button type="submit">변경</button>
-		<sec:csrfInput/>
-	</form>
+		<span id="idNullMsg" style="display: none;">아이디를 입력해주세요.</span>
+		<span id="notFound" style="display: none;">유효하지 않은 아이디입니다.</span> <br>
+		<button type="button" id="btn" style="margin: 10px;">아이디 확인 </button>
+	</div>
+	
+	<!-- 비밀번호 답변 영역 -->
+	<div id="pwdQnA_Box" style="display: none;">
+		<p>비밀번호 힌트에 대한 답변을 입력해 주세요.</p>
+		<label for="passwordHint">비밀번호 힌트 : </label>
+		<input type="text" name="passwordHint" id="passwordHint" value="" readonly="readonly"> <br>
+		<label for="passwordCnsr">비밀번호 답변 : </label>
+		<input type="text" name="passwordCnsr" id="passwordCnsr">
+		<br>
+		<span id="incorrectPwdCnsr" style="display: none;">답변이 올바르지 않습니다.</span>
+		<span id="nullPwdCnsr" style="display: none;">답변을 입력해 주세요.</span> <br>
+		<button type="buton" id="btn_pwdQnA" style="margin: 10px;">확인</button>
+	</div>
+	
+	
+	<!-- 비밀번호 변경 영역 -->
+	<div id="changePwd_Box" style="display: none;">
+		<p>변경할 비밀번호를 입력해 주세요.</p>
+		<form action="${url}/changePwd" method="post" id="changePwdForm">
+			<input type="hidden" name="userId" id="hiddenUserId" readonly="readonly">
+			<input type="hidden" name="allowPwdChange" id="allowPwdChange" readonly="readonly">
+			<label for="pwd">변경할 비밀번호 : </label>
+			<input type="password" name="password" id="pwd" placeholder="비밀번호(8자리 이상)">
+			<button type="button" id="pwdToggleBtn">show/hide</button>
+			<br>
+			<span id="pwdNullMsg" class="msg" style="display: none;">비밀번호를 입력해 주세요.</span>
+			<span id="pwdValidMsg" class="msg" style="display: none;">8자리 미만, 연속된 동일 문자 4자 이상 사용 불가</span>
+			<br>
+			<button type="submit" style="margin: 10px;">변경</button>
+			<sec:csrfInput/>
+		</form>
+	</div>
 </div>
-
 
 <script src="/js/jquery-3.7.1.min.js"></script>
 <script>
