@@ -38,6 +38,11 @@
 	    <session-management>
 	        <concurrency-control max-sessions="1" error-if-maximum-exceeded="true" />
 	    </session-management>
+	    
+	    <!-- X-Frame-Options 헤더 설정, 다른 도메인에서 iframe을 통해 접근을 허용 -->
+	    <headers>
+		    <frame-options policy="SAMEORIGIN"/>
+		</headers>
     </http>
     
 	<!-- 사용자 권한 서비스 -->

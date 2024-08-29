@@ -342,7 +342,6 @@
     	//파일을 하나씩 보내고, 결과를 받음.
     	for(var j=0, k=0; j < nImageInfoCnt; j++) {
 				tempFile = htImageInfo['img'+j];
-				console.log(tempFile);
 				try{
 					if(!!tempFile){
 						//Ajax통신하는 부분. 파일과 업로더할 url을 전달한다.
@@ -354,6 +353,28 @@
 				
     	}
 	}
+	
+	// 스프링 시큐리티 토큰을 가져오기 위한 함수 추가
+	var token = '';
+	var header = '';
+	function getCsrfToken() {
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', '/csrf-token', true);
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4 && xhr.status === 200) {
+				var response = JSON.parse(xhr.responseText);
+				token = response.token;
+				header = response.headerName;
+				console.log('CSRF Token:', token);
+				console.log('CSRF Header:', header);
+			}
+		};
+		xhr.send();
+	}
+	document.addEventListener('DOMContentLoaded', function() {
+			getCsrfToken();
+	});
+
     // 24.08.28 - 업로드 작업을 Promise로 감싸서 순차진행
     function callAjaxForHTML5 (tempFile, sUploadURL){
 		return new Promise((resolve, reject) => {
@@ -386,26 +407,6 @@
 		});
     }
 
-	// 스프링 시큐리티 토큰을 가져오기 위한 함수 추가
-	var token = '';
-	var header = '';
-	function getCsrfToken() {
-	    var xhr = new XMLHttpRequest();
-	    xhr.open('GET', '/csrf-token', true);
-	    xhr.onreadystatechange = function() {
-	        if (xhr.readyState === 4 && xhr.status === 200) {
-	            var response = JSON.parse(xhr.responseText);
-	            token = response.token;
-	            header = response.headerName;
-	            console.log('CSRF Token:', token);
-	            console.log('CSRF Header:', header);
-	        }
-	    };
-	    xhr.send();
-	}
-	document.addEventListener('DOMContentLoaded', function() {
-	        getCsrfToken();
-	});
     
     function makeArrayFromString(sResString){
     	var	aTemp = [],

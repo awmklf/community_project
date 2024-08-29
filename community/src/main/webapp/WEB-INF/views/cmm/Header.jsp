@@ -62,7 +62,6 @@
 	}
 	
 	.reply-indent {
-	    margin-left: 100px;
 	    padding: 10px;
 	    border: 1px solid #ccc;
 	    border-radius: 5px;
@@ -80,7 +79,7 @@
 			<a href="/">HOME</a> |
 			<c:choose>
 				<c:when test="${empty userId}">
-					<a href="/user/login">로그인</a>
+					<a href="/user/login">로그인</a> | <a href="${url}/signup">회원가입</a>
 				</c:when>
 				<c:otherwise>
 					<strong><c:out value="${nickname}"/></strong>님 환영합니다 |

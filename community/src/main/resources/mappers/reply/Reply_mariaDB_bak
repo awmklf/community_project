@@ -24,8 +24,6 @@ WITH RECURSIVE ReplyHierarchy AS (
 	        , LAST_UPDT_PNTTM
 	        , 0 AS DEPTH
 	        , REPLY_ID AS ROOT_REPLY
-	        , CONCAT('', SUBSTR(REPLY_ID, 5)) AS SORT_PATH
-	        
 	    FROM REPLY
 	    WHERE BOARD_ID = #{boardId} 
 	    	AND PARENT_REPLY_ID IS NULL
@@ -44,7 +42,6 @@ WITH RECURSIVE ReplyHierarchy AS (
 	        , A.LAST_UPDT_PNTTM
 	        , RH.DEPTH + 1 AS DEPTH
 	        , RH.ROOT_REPLY
-	        , CONCAT(RH.SORT_PATH, '-', SUBSTR(A.REPLY_ID, 5)) AS SORT_PATH
 	    FROM REPLY A
 		    JOIN ReplyHierarchy RH 
 		    	ON A.PARENT_REPLY_ID = RH.REPLY_ID
@@ -61,7 +58,6 @@ WITH RECURSIVE ReplyHierarchy AS (
 		, RH.LAST_UPDT_PNTTM
 		, RH.DEPTH
 		, RH.ROOT_REPLY
-		, RH.SORT_PATH
 		, B.REGISTER_ID AS PARENT_ID
 		, C.NICKNAME
 		, D.NICKNAME AS PARENT_NICKNAME
@@ -79,19 +75,12 @@ WITH RECURSIVE ReplyHierarchy AS (
 	    LEFT JOIN USERINFO D 
 	    	ON B.REGISTER_ID = D.USER_ID
 	WHERE 
-	    CASE 
-	        WHEN RH.USE_AT = 'N' AND (
-	            NOT EXISTS (
-	                SELECT 1 
-	                FROM ReplyHierarchy 
-	                WHERE SORT_PATH LIKE CONCAT(RH.SORT_PATH, '%') AND USE_AT = 'Y'
-	            )
-	        ) THEN 'Y'
-	        ELSE 'N'
-    	END = 'N'
+	    EXISTS (SELECT 1 
+	            FROM REPLY 
+	            WHERE PARENT_REPLY_ID = RH.REPLY_ID AND USE_AT = 'Y'
+	           ) OR RH.USE_AT = 'Y'
 	ORDER BY 
 		ROOT_REPLY
-		, RH.SORT_PATH
 		, FRST_REGIST_PNTTM
 	LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
 </select>
@@ -113,7 +102,6 @@ WITH RECURSIVE ReplyHierarchy AS (
             , PARENT_REPLY_ID
             , BOARD_ID
             , USE_AT
-            , CONCAT('', SUBSTR(REPLY_ID, 5)) AS SORT_PATH
         FROM REPLY
         WHERE BOARD_ID = #{boardId} 
             AND PARENT_REPLY_ID IS NULL
@@ -125,7 +113,6 @@ WITH RECURSIVE ReplyHierarchy AS (
             , A.PARENT_REPLY_ID
             , A.BOARD_ID
             , A.USE_AT
-            , CONCAT(RH.SORT_PATH, '-', SUBSTR(A.REPLY_ID, 5)) AS SORT_PATH
         FROM REPLY A
             JOIN ReplyHierarchy RH 
                 ON A.PARENT_REPLY_ID = RH.REPLY_ID
@@ -133,16 +120,11 @@ WITH RECURSIVE ReplyHierarchy AS (
     SELECT  COUNT(*)
     FROM ReplyHierarchy RH
     WHERE 
-        CASE 
-	        WHEN RH.USE_AT = 'N' AND (
-	            NOT EXISTS (
-	                SELECT 1 
-	                FROM ReplyHierarchy 
-	                WHERE SORT_PATH LIKE CONCAT(RH.SORT_PATH, '%') AND USE_AT = 'Y'
-	            )
-	        ) THEN 'Y'
-	        ELSE 'N'
-    	END = 'N'
+        EXISTS (
+        	SELECT 1 
+            FROM REPLY 
+            WHERE PARENT_REPLY_ID = RH.REPLY_ID AND USE_AT = 'Y'
+        ) OR RH.USE_AT = 'Y'
 </select>
 
 <!-- 덧글 조회 쿼리 -->

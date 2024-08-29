@@ -7,9 +7,30 @@
 
 <sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')" var="mngRole"/>
 <sec:authorize access="hasRole('ROLE_ADMIN')" var="adminRole"/>
-<sec:authorize access="isAuthenticated()">
+<sec:authorize access="isAuthenticated()" var="auth">
 	<sec:authentication property="principal" var="principal"/>
 </sec:authorize>
+
+<style>
+[data-depth="1"] {
+    margin-left: 40px;
+}
+
+[data-depth="2"] {
+    margin-left: 80px;
+}
+
+[data-depth="3"] {
+    margin-left: 120px;
+}
+
+[data-depth="4"] {
+    margin-left: 160px;
+}
+
+
+
+</style>
 
 <div style="padding: 5px; display: flex; justify-content: space-between;">
 	<%-- 덧글 개수 영역 --%>
@@ -38,11 +59,17 @@
 			<button id="btn-addRep">작성</button>
 		</div>
 	</sec:authorize>
+	<c:if test="${auth eq false}">
+		<div id="reply" style="text-align: left; border: 0px; margin: 0; margin-left: 10px;">
+			<textarea rows="5" cols="100" id="replyContent" maxlength="1000" placeholder="덧글 작성을 위해 로그인 해주세요." readonly="readonly"></textarea>
+			<a href="/user/login">로그인</a>
+		</div>
+	</c:if>
 </div>
 
 <%-- 덧글 내용 템플릿 --%>
 <template id="viewReplyTemplate">
-    <div class="reply" id="" style="text-align: left;">
+    <div class="reply" id="" data-depth="">
         <div style="text-align: left; border: 0px; margin: 0;"><strong class="nickname"></strong> | <span class="frstRegistPnttm"></span></div>
         <hr>
         <div class="parentReply" style="text-align: left; border: 0px; margin: 0;"><strong class="parentNickname"></strong>님에게 답글</div>
@@ -107,6 +134,8 @@
     	            	repCntPerPage++;
     	            	var updatedRep = '';
     	            	var replyViewTemplate = $('#viewReplyTemplate').contents().clone(); // 템플릿 복제
+    	            	replyViewTemplate.attr('id', reply.replyId);
+						replyViewTemplate.attr('data-depth', reply.depth); // 덧글 깊이
                         if (reply.parentReplyId) { // 덧글에 대한 답글인 경우
                             replyViewTemplate.addClass('reply-indent');
                             replyViewTemplate.find('.parentReply').show();
@@ -114,7 +143,7 @@
                         } else {
                         	 replyViewTemplate.find('.parentReply').remove();
                         }
-                        replyViewTemplate.attr('id', reply.replyId);
+                        
     	            	replyViewTemplate.find('.nickname').text(reply.nickname);
     	            	if (reply.useAt == 'Y' && reply.lastUpdtPnttm != null) {
     	            		updatedRep = '(' + reply.lastUpdtPnttm + ' 수정됨)';
@@ -131,6 +160,9 @@
                         } else {
                             replyViewTemplate.find('.btn-delRep').remove();
                         }
+                        if (reply.depth >= 4) { // 댓글계층 5단계부터 답글 작성x
+           	            	replyViewTemplate.find('.btn-addChildRepForm').remove();
+           	             }
                         replyViewTemplate.find('.btn-editRepForm').attr('data-reply-id', reply.replyId);
                         replyViewTemplate.find('.btn-delRep').attr('data-reply-id', reply.replyId);
                         replyViewTemplate.find('.btn-addChildRepForm').attr('data-reply-id', reply.replyId);
@@ -146,6 +178,7 @@
    	                $('.btn-addChildRepForm').click(function() { // 답글 작성창 띄우기 이벤트
    	                	replyForm.call(this);
    	                });
+   	                
    	                
    	          		// 페이지네이션 추가
 					if (data.pagination.replyListCnt > 0) {

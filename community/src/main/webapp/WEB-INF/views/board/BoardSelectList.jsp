@@ -116,7 +116,7 @@
 		<c:forEach var="result" items="${resultList}" varStatus="status">
 			<tr>
 				<td class="num">
-					<c:out value="${paginationInfo.totalRecordCount - ((searchVO.pageIndex-1) * searchVO.pageUnit) - (status.count - 1)}"/>
+					<c:out value="${paginationInfo.totalRecordCount - ((searchVO.pageIndex-1) * searchVO.pageUnit) - (status.index)}"/>
 				</td>
 				<td style="padding-left: 20px; text-align: left;">
 					<c:choose>

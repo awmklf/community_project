@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
 <Configuration>
-
 	<Appenders>
 		<!-- 로그 메세지를 콘솔(SYSTEM_OUT)에 출력하는ConsoleAppenders 등록 -->
 		<Console name="console" target="SYSTEM_OUT">

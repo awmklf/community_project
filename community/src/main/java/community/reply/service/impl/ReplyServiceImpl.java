@@ -112,7 +112,7 @@ public class ReplyServiceImpl implements ReplyService {
 				throw new RuntimeException("Invalid reply ID format: " + lastReplyId, e);
 			}
 		}
-		String nextId = String.format("REP_%011d", nextIdNum);
+		String nextId = String.format("REP_%010d", nextIdNum);
 		vo.setReplyId(nextId);
 		int resultNum = replyDAO.insertReply(vo);
 		return resultNum;

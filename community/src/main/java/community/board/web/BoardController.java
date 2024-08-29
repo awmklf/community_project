@@ -30,7 +30,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import community.board.service.BoardService;
 import community.board.service.BoardVO;
 import community.cmm.CommonService;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Controller
 public class BoardController {
 
@@ -48,11 +50,13 @@ public class BoardController {
 	// 파일 업로드를 처리하는 메소드
     @PostMapping("/board/uploadImage")
     public void uploadImage(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    	String fileName = request.getHeader("file-name");
         String fileSize = request.getHeader("file-size");
         String fileType = request.getHeader("file-Type");
     	
-    	// 파일 이름과 확장자 추출
-        String fileName = request.getHeader("file-name");
+    	// 파일 이름, 확장자 분리
+        String fileNamepre = fileName.substring(fileName.indexOf(".") - 1);
+        log.info("file Oriname : {}",fileNamepre);
         String fileNameSuffix = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
         String[] suffixArr = {"jpg", "png", "bmp", "gif"};
         
@@ -102,7 +106,10 @@ public class BoardController {
         // 파일 정보 반환
         response.getWriter().println(fileInfo);
         
-        System.out.println("==================================================="+fileName);
+        log.info("fileName : {}", fileName);
+        log.info("fileInfo : {}", fileInfo);
+        log.info("fileSize : {}", fileSize);
+        log.info("fileType : {}", fileType);
     }
 	
 	
@@ -110,8 +117,8 @@ public class BoardController {
 	@ResponseBody
 	@GetMapping("/csrf-token")
     public Map<String, String> getCsrfToken(HttpServletRequest request) {
+		Map<String, String> tokenMap = new HashMap<>();
         CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
-        Map<String, String> tokenMap = new HashMap<>();
         tokenMap.put("token", csrfToken.getToken());
         tokenMap.put("headerName", csrfToken.getHeaderName());
         return tokenMap;
