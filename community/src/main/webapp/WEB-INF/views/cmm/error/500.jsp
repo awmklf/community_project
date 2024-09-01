@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="icon" href="/img/favicon.png">
-    <title>404 Error</title>
+    <title>500 Error</title>
 <style>
 	body {
 		font-family: Arial, sans-serif;
@@ -27,6 +27,10 @@
 		color: #333;
 	}
 	
+	h2 {
+		color: #333;
+	}
+	
 	a {
 		text-decoration: none;
 		color: black;
@@ -38,7 +42,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>404 - 페이지를 찾을 수 없습니다.</h1>
+        <h1>500 - 문제가 발생하였습니다.</h1>
+        <h2>관리자에게 문의 바랍니다.</h2>
         <a href="/">홈으로 돌아가기</a>
     </div>
 </body>

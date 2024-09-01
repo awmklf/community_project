@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="icon" href="/img/favicon.png">
-    <title>404 Error</title>
+    <title>400 Error</title>
 <style>
 	body {
 		font-family: Arial, sans-serif;
@@ -26,19 +26,11 @@
 	h1 {
 		color: #333;
 	}
-	
-	a {
-		text-decoration: none;
-		color: black;
-	}
-	a:hover {
-	    color: gray;
-	}
 </style>
 </head>
 <body>
     <div class="container">
-        <h1>404 - 페이지를 찾을 수 없습니다.</h1>
+        <h1>400 BAD REQUEST - 잘못된 요청입니다.</h1>
         <a href="/">홈으로 돌아가기</a>
     </div>
 </body>

@@ -8,6 +8,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<link rel="icon" href="/img/favicon.png">
 <title>로그인 - 커뮤니티</title>
 <style>
 	body {

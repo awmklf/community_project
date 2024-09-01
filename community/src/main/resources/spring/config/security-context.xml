@@ -12,6 +12,7 @@
     	<!-- 시큐리티 감시 url 및 url에 접근 가능 권한 정의 -->
     		<intercept-url pattern="/resources/**" access="permitAll"/>
     		<intercept-url pattern="/img/**" access="permitAll"/>
+    		<intercept-url pattern="/image/**" access="permitAll"/>
     		<intercept-url pattern="/board/test" access="isAuthenticated()"/>
 			<intercept-url pattern="/resources/smarteditor2/**" access="isAuthenticated()"/>
 			<intercept-url pattern="/user/**" access="permitAll"/>

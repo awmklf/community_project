@@ -33,6 +33,7 @@
 	<form action="${actionUrl}" method="post" id="form" >
 		<input type="hidden" name="boardId" value="${result.boardId}">
 		<input type="hidden" name="registerId" value="${result.registerId}">
+		<input type="hidden" name="atchFileId" id="atchFileId" value="${result.atchFileId}">
 		<div style="text-align: left;">
 			<select id="" name="category">
 				<option value="1" ${result.category eq '1' ? 'selected' : ''}>일반</option>
@@ -107,8 +108,51 @@
 	</form>
 </div>
 
+<script type="text/javascript">
+// 게시글 작성 임시 쿠키 생성
+function setSessionCookie(name, value) {
+    document.cookie = name + "=" + (value || "") + "; path=/";
+}
+function generateUniqueValue() {
+    return fetch('/temp-id', {
+        method: 'GET',
+        headers: {'Accept':'application/json'}
+    }).then(
+        resp => resp.json()
+    ).then(function (data) {
+        return data.tempImageId;
+    }).catch(function (err) {
+        console.log(err);
+        return null;
+    });
+}
+// 게시글 작성의 경우 신규 쿠키생성, 수정의 경우 파일아이디값 사용
+<c:choose>
+	<c:when test="${not empty result.atchFileId}">
+		var fileId = $('#atchFileId').val();
+		setSessionCookie('tempUniqueVal', fileId);
+	</c:when>
+	<c:otherwise>
+		generateUniqueValue().then(function(uniqueValue) {
+		    if (uniqueValue) {
+		        setSessionCookie('tempUniqueVal', uniqueValue);
+		        console.log('Temporary Unique Value:', uniqueValue);
+		    } else {
+		        console.log('Failed to generate unique value.');
+		    }
+		});
+	</c:otherwise>
+</c:choose>
+// 페이지를 벗어나면 쿠키 삭제
+window.addEventListener('beforeunload', function() {
+    document.cookie = 'tempUniqueVal=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+});
+</script>
+
 
 <script>
+	var tempId;
+
 	$(document).ready(function() {
 		
 		// 페이지 로드 시에 '비공개 여부' 섹션 표시 여부 체크
@@ -124,7 +168,7 @@
 				return false;
 			}
 			$("#form").submit();
-// 			return false;
+ 			return false;
 		});
 		
 		// 취소

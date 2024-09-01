@@ -254,7 +254,6 @@
 			}
 			
 			for (var i = 0, j = nImageFileCount ; i < nCount ; i++){
-				console.log(files[i].type);
 				if (!rFilter.test(files[i].type)) {
 					alert("이미지파일 (jpg,gif,png,bmp)만 업로드 가능합니다.");
 				} else if(files[i].size > nMaxImageSize){
@@ -263,7 +262,6 @@
 					//제한된 수만 업로드 가능.
 					if ( j < nMaxImageCount ){
 						sListTag += addImage(files[i]);
-						
 						//다음 사진을위한 셋팅
 						j = j+1;
 						nImageInfoCnt = nImageInfoCnt+1;
@@ -315,7 +313,7 @@
 		} else {
 			//이미지 정보 저장							
 			htImageInfo['img'+nImageInfoCnt] = ofile;
-			
+			console.log(ofile);
     		//List 마크업 생성하기
 			aFileList.push('	<li id="img'+nImageInfoCnt+'" class="imgLi"><span>'+ sFileName +'</span>');
 			aFileList.push('	<em>'+ sFileSize +'</em>');
@@ -337,7 +335,7 @@
     	var tempFile,
     		sUploadURL;
     	
-    	sUploadURL= '/board/uploadImage'; 	//upload URL
+    	sUploadURL= '/board/uploadImage'; 	// upload URL
     	
     	//파일을 하나씩 보내고, 결과를 받음.
     	for(var j=0, k=0; j < nImageInfoCnt; j++) {
@@ -353,8 +351,8 @@
 				
     	}
 	}
-	
-	// 스프링 시큐리티 토큰을 가져오기 위한 함수 추가
+
+	// 24.08.27 - 스프링 시큐리티 토큰을 가져오기 위한 함수 추가
 	var token = '';
 	var header = '';
 	function getCsrfToken() {
@@ -365,8 +363,8 @@
 				var response = JSON.parse(xhr.responseText);
 				token = response.token;
 				header = response.headerName;
-				console.log('CSRF Token:', token);
 				console.log('CSRF Header:', header);
+				console.log('CSRF Token:', token);
 			}
 		};
 		xhr.send();
@@ -407,7 +405,8 @@
 		});
     }
 
-    
+    // 서버로부터 문자열을 받아 항목별로 분리하고 키밸류 값으로 htTemp 객체에 저장 후 이를 aResult에 배열에 추가
+	// aResult 에 배열의 길이 저장
     function makeArrayFromString(sResString){
     	var	aTemp = [],
     		aSubTemp = [],
@@ -419,9 +418,12 @@
  	    		return ;
  	    	}
  			aTemp = sResString.split("&");
-	    	for (var i = aTemp.length; i > 0  ; i--){
-	    		if( !!aTemp[i-1] && aTemp[i-1] != "" && aTemp[i-1].indexOf("=") > 0){
-	    			aSubTemp = aTemp[i-1].split("=");
+			 for (var i = 0; i < aTemp.length ; i++){
+	    		if( !!aTemp[i] && aTemp[i] != "" && aTemp[i].indexOf("=") > 0){
+	    			aSubTemp = aTemp[i].split("=");
+					aSubTemp = aSubTemp.map(function(item) {
+						return item.replace(/(\r\n|\n|\r)/gm, ""); // 24.08.31 줄바꿈 문자열 제거
+					});
 	    			htTemp[aSubTemp[0]] = aSubTemp[1];
 	    		}
 	 		}
@@ -433,9 +435,10 @@
     	aResult[aResultleng] = htTemp;
     	
     	if(aResult.length == nImageFileCount){
+			console.log(aResult);
     		setPhotoToEditor(aResult); 
     		aResult = null;
-    		window.close();
+    		window.close(); // 이미지 업로드 시 주석처리로 창닫힘 방지 가능
     	}
     }
     
@@ -492,7 +495,8 @@
 	 * @return
 	 */
 	function onAjaxError (){
-		alert("[가이드]사진 업로더할 서버URL셋팅이 필요합니다.-onAjaxError");
+		/*alert("[가이드]사진 업로더할 서버URL셋팅이 필요합니다.-onAjaxError");*/
+		alert("오류가 발생했습니다.");
 	}
 
  	/**

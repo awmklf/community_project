@@ -39,7 +39,7 @@
 	<div style="border: 0px; text-align: center; margin: 0;">
 		<label for="selectRecord">덧글 목록 표시</label>
 		<select id="selectRecord">
-			<option value="1">1개</option>
+			<%-- <option value="1">1개</option> --%>
 			<option value="10" selected>10개</option>
 			<option value="30">30개</option>
 			<option value="50">50개</option>

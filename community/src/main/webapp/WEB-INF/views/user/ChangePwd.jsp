@@ -9,6 +9,7 @@
 <head>
 <meta charset="UTF-8">
 <sec:csrfMetaTags/>
+<link rel="icon" href="/img/favicon.png">
 <title>비밀번호 변경 - 커뮤니티</title>
 <style type="text/css">
 	body {

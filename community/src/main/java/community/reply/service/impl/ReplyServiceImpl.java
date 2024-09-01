@@ -10,8 +10,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import community.cmm.CommonService;
 import community.cmm.pagination.PaginationCalc;
+import community.cmm.service.CommonService;
 import community.reply.service.ReplyDAO;
 import community.reply.service.ReplyService;
 import community.reply.service.ReplyVO;

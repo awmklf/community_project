@@ -4,31 +4,33 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="/img/favicon.png">
     <title>403 Error</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f1f1f1;
-        }
-        .container {
-            width: 80%;
-            margin: 0 auto;
-            padding: 50px;
-        }
-        h1 {
-            color: #333;
-        }
-        p {
-            color: #666;
-        }
-    </style>
+<style>
+	body {
+		font-family: Arial, sans-serif;
+		margin: 0;
+		padding: 0;
+		background-color: #f1f1f1;
+		display: flex;
+		justify-content: center;
+	}
+	
+	.container {
+		width: 80%;
+		margin: 0 auto;
+		padding: 50px;
+		text-align: center;
+	}
+	
+	h1 {
+		color: #333;
+	}
+</style>
 </head>
 <body>
     <div class="container">
         <h1>403 - 접근이 거부되었습니다.</h1>
-        <p>잘못된 접근입니다. 관리자에게 문의하십시오.</p>
         <a href="/">홈으로 돌아가기</a>
     </div>
 </body>

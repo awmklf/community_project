@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="community.cmm.service.FileDAO">
+
+
+
+<!-- 첨부파일리스트 조회 쿼리 -->
+<select id="selectFileList" resultType="FileVO">
+	SELECT
+		ATCH_FILE_ID
+		, FILE_SN
+		, CREAT_DT
+		, USE_AT
+		, DELETED_AT
+		, FILE_STRE_COURS
+		, STRE_FILE_NM
+		, ORIGNL_FILE_NM
+		, FILE_EXTSN
+		, FILE_SIZE
+	FROM FILE
+	WHERE 
+		<choose>
+			<when test='useAt == "Y"'>
+				USE_AT = 'Y'
+			</when>
+			<when test='useAt == "N"'>
+				USE_AT = 'N'
+			</when>
+			<when test='useAt == "schedule"'>
+				USE_AT != 'Y'
+			</when>
+			<otherwise>
+				USE_AT != 'N'
+			</otherwise>
+		</choose>
+		<if test='atchFileId != null and atchFileId != "" and atchFileId != "schedule"'>
+			AND ATCH_FILE_ID = #{atchFileId}
+		</if>
+</select>
+
+<!-- 첨부파일 마지막 번호 조회 쿼리 -->
+<select id="selectLastFileSn" resultType="java.lang.Integer">
+	SELECT
+		MAX(FILE_SN)
+	FROM FILE
+	WHERE ATCH_FILE_ID = #{atchFileId}
+</select>
+
+<!-- 첨부파일 등록 쿼리 -->
+<insert id="insertFile">
+	INSERT INTO FILE(
+		ATCH_FILE_ID
+		, FILE_SN
+		, CREAT_DT
+		, USE_AT
+		, FILE_STRE_COURS
+		, STRE_FILE_NM
+		, ORIGNL_FILE_NM
+		, FILE_EXTSN
+		, FILE_SIZE
+	) VALUES(
+		#{atchFileId}
+		, #{fileSn}
+		, NOW()
+		, #{useAt}
+		, #{fileStreCours}
+		, #{streFileNm}
+		, #{orignlFileNm}
+		, #{fileExtsn}
+		, #{fileSize}
+	)	
+</insert>
+
+<update id="updateUseAt">
+	UPDATE FILE SET 
+		USE_AT = #{useAt}
+		<if test='useAt == "N"'>
+		, DELETED_AT = NOW()
+		</if>
+	WHERE 
+		ATCH_FILE_ID = #{atchFileId}
+			AND FILE_SN = #{fileSn}
+</update>
+
+</mapper>

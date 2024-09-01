@@ -1,4 +1,4 @@
-package community.cmm;
+package community.cmm.service.impl;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import community.cmm.service.CommonService;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -16,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
-public class CommonService {
+public class CommonServiceImpl implements CommonService {
 
 	/** 게시글 번호 치환 */
 	public String convertNumToBoardId(int boardIdNum) throws Exception {
@@ -30,7 +31,6 @@ public class CommonService {
 		boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 		boolean isManager = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_MANAGER"));
 		boolean isOwner = authentication.getName().equals(registerId);
-		log.debug("Register ID : {}",registerId);
 		log.debug("isAdmin : {}, isManager : {}, isOwner : {}",isAdmin, isManager, isOwner);
 		if (isAdmin)
 			return "admin";

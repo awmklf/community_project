@@ -56,5 +56,9 @@ public class BoardVO extends ComPageVO {
 	private int numRecommendations;
 	/** 덧글 수 */
 	private int replyCnt;
+	/** 파일 번호 */
+	private Integer fileSn;
+	/** 게시글 이미지 포함 확인 */
+	private Integer chkImage;
 
 }

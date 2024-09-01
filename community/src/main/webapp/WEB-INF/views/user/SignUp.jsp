@@ -9,6 +9,7 @@
 <head>
 <meta charset="UTF-8">
 <sec:csrfMetaTags/>
+<link rel="icon" href="/img/favicon.png">
 <title>회원가입 - 커뮤니티</title>
 <style>
 	body {

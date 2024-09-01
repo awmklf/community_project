@@ -9,7 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import community.reply.service.ReplyService;
@@ -24,7 +25,7 @@ public class ReplyController {
 
 	/** 덧글 목록 조회 */
 	@ResponseBody
-	@RequestMapping("/reply/list/{boardIdNum}")
+	@GetMapping("/reply/list/{boardIdNum}")
 	public Map<String, Object> selectReplyList(ReplyVO vo, ModelMap model) throws Exception {
 		Map<String, Object> map = replyService.selectReplyList(vo);
 		return map;
@@ -32,7 +33,7 @@ public class ReplyController {
 
 	/** 덧글 작성 */
 	@ResponseBody
-	@RequestMapping("/reply/{boardIdNum}/add")
+	@PostMapping("/reply/{boardIdNum}/add")
 	@PreAuthorize("isAuthenticated()")
 	public Map<String, Object> addReply(ReplyVO vo, HttpServletRequest request) throws Exception {
 		vo.setCreatIp(request.getRemoteAddr());
@@ -44,7 +45,7 @@ public class ReplyController {
 
 	/** 덧글 수정 */
 	@ResponseBody
-	@RequestMapping("/reply/{boardIdNum}/edit")
+	@PostMapping("/reply/{boardIdNum}/edit")
 	@PreAuthorize("isAuthenticated()")
 	public Map<String, Object> editReply(ReplyVO vo) throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -55,7 +56,7 @@ public class ReplyController {
 
 	/** 덧글 삭제 */
 	@ResponseBody
-	@RequestMapping("/reply/{boardIdNum}/delete")
+	@PostMapping("/reply/{boardIdNum}/delete")
 	@PreAuthorize("isAuthenticated()")
 	public Map<String, Object> delReply(ReplyVO vo) throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();

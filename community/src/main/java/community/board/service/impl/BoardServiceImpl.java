@@ -15,8 +15,10 @@ import org.springframework.util.StringUtils;
 import community.board.service.BoardDAO;
 import community.board.service.BoardService;
 import community.board.service.BoardVO;
-import community.cmm.CommonService;
 import community.cmm.pagination.PaginationCalc;
+import community.cmm.service.CommonService;
+import community.cmm.service.FileService;
+import community.cmm.service.FileVO;
 
 @Service
 public class BoardServiceImpl implements BoardService {
@@ -24,25 +26,29 @@ public class BoardServiceImpl implements BoardService {
 	/** boardDAO DI */
 	@Autowired
 	private BoardDAO boardDAO;
-	
+
 	/** redisTemplate DI */
 	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
-	
+
 	/** commService DI */
 	@Autowired
 	CommonService cmmService;
-	
+
+	/** fileService DI */
+	@Autowired
+	FileService fileService;
+
 	/** 게시글 번호 치환 */
 	public String convertNumToBoardId(int boardIdNum) throws Exception {
 		return cmmService.convertNumToBoardId(boardIdNum);
 	}
-	
+
 	/** 접근 권한 확인 */
 	public String roleChk(String registerId) throws Exception {
-        return cmmService.roleChk(registerId);
-    }
-	
+		return cmmService.roleChk(registerId);
+	}
+
 	/** 게시글 목록 조회 */
 	@Override
 	public Map<String, Object> selectBoardList(BoardVO vo) throws Exception {
@@ -85,25 +91,24 @@ public class BoardServiceImpl implements BoardService {
 	@Override
 	public BoardVO selectBoard(BoardVO vo) throws Exception {
 		BoardVO result = null;
-		
+
 		if (vo.getBoardIdNum() == null)
 			return result;
 		vo.setBoardId(convertNumToBoardId(vo.getBoardIdNum()));
-		
+
 		result = boardDAO.selectBoard(vo);
-		
+
 		if (result == null) // 게시글 존재 여부 체크
 			return result;
 		result.setBoardIdNum(vo.getBoardIdNum());
-		
+
 		// 비밀글 여부 및 접근 권한 확인
 		if ("Y".equals(result.getOthbcAt())) {
 			// 작성자 정보 저장 및 권한 확인
 			vo.setRegisterId(result.getRegisterId());
 			roleChk(vo.getRegisterId());
 		}
-		if ("Y".equals(vo.getTriggerViewCntUp())
-				&& !result.getRegisterId().equals(vo.getUserId())) {
+		if ("Y".equals(vo.getTriggerViewCntUp()) && !result.getRegisterId().equals(vo.getUserId())) {
 			// 조회수 키 생성(게시글 아이디, 유저 아이디, 유저 아이피)
 			String keyForId = "ID:" + vo.getUserId() + ":view:" + vo.getBoardId();
 			String keyForIp = "IP:" + vo.getUserIp() + ":view:" + vo.getBoardId();
@@ -112,7 +117,7 @@ public class BoardServiceImpl implements BoardService {
 			Boolean isViewedByIp = (Boolean) redisTemplate.opsForValue().get(keyForIp);
 			if ((isViewedByUser == null || !isViewedByUser) && (isViewedByIp == null || !isViewedByIp)) { // 아이디 및 아이피 이력이 없을 때
 				boardDAO.updateViewCnt(vo); // 조회수 증가
-				result.setInqireCo(result.getInqireCo()+1);// 뷰에 조회수 +1 갱신
+				result.setInqireCo(result.getInqireCo() + 1);// 뷰에 조회수 +1 갱신
 				// Redis에 조회 정보 저장 (5분 유지)
 				redisTemplate.opsForValue().set(keyForIp, true, 5, TimeUnit.MINUTES);
 				if (vo.getUserId() != null) // 비로그인 유저 저장 방지
@@ -129,18 +134,18 @@ public class BoardServiceImpl implements BoardService {
 			vo.setIsNotice("N");
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		vo.setRegisterId(authentication.getName());
-		// 게시글 번호 증가 로직
+		// 게시글 번호 생성 로직
 		String lastBoardId = boardDAO.selectLastBoardId();
 		int nextIdNum = 1;
-		if (lastBoardId != null && lastBoardId.startsWith("BOARD_")) {
-			try {
-				nextIdNum = Integer.parseInt(lastBoardId.substring("BOARD_".length())) + 1;
-			} catch (NumberFormatException e) {
-				throw new RuntimeException("Invalid board ID format: " + lastBoardId, e);
-			}
+		if (lastBoardId != null && lastBoardId.startsWith("BOARD_")) { // null 및 문자열 "BOARD_" 시작 체크
+			nextIdNum = Integer.parseInt(lastBoardId.substring("BOARD_".length())) + 1;
 		}
 		String nextId = String.format("BOARD_%09d", nextIdNum);
 		vo.setBoardId(nextId);
+		FileVO fvo = new FileVO();
+		fvo.setBoardCn(vo.getBoardCn());
+		String fileId = fileService.updateFileUseAt(fvo); // 첨부 최종 등록
+		vo.setAtchFileId(fileId);
 		boardDAO.insertBoard(vo);
 
 		return nextIdNum;
@@ -156,7 +161,11 @@ public class BoardServiceImpl implements BoardService {
 			vo.setMngAt("Y");
 		else if ("owner".equals(role))
 			vo.setUserId(authentication.getName());
-
+		FileVO fvo = new FileVO();
+		fvo.setBoardCn(vo.getBoardCn());
+		fvo.setAtchFileId(vo.getAtchFileId());
+		String fileId = fileService.updateFileUseAt(fvo); // 첨부 수정
+		vo.setAtchFileId(fileId);
 		boardDAO.updateBoard(vo);
 	}
 
@@ -171,6 +180,10 @@ public class BoardServiceImpl implements BoardService {
 			vo.setMngAt("Y");
 		else if ("owner".equals(role))
 			vo.setUserId(authentication.getName());
+		FileVO fvo = new FileVO();
+		fvo.setBoardCn("");
+		fvo.setAtchFileId(vo.getAtchFileId());
+		fileService.updateFileUseAt(fvo); // 첨부 삭제
 		boardDAO.deleteBoard(vo);
 	}
 

@@ -20,7 +20,7 @@
 <div style="padding: 0; display: flex; justify-content: center;">
 	<%-- 게시글 목록 수 영역 --%>
 	<div style="border: 0px; margin: 0; margin-left: auto;">
-		<form id="pageSizeForm" action="/board" method="post">
+		<form id="pageSizeForm" action="/board" method="get">
 			<input type="hidden" name="searchCondition" value="${searchVO.searchCondition}"/>
 			<input type="hidden" name="searchKeyword" value="${searchVO.searchKeyword}"/>
 			<label for="selectRecord">게시글 표시</label>
@@ -138,6 +138,9 @@
 					</c:url>
 					<a href="${viewUrl}" style="border: 0;">
 						<c:out value="${categoryName}"/> 
+						<c:if test="${result.chkImage >= 1}">
+							<img alt="이미지 게시글 아이콘" src="/img/ico_img.png">
+						</c:if>
 						<c:if test="${result.othbcAt eq 'Y'}">
 							<img alt="비밀글 아이콘" src="/img/ico_board_lock.gif">
 						</c:if>
@@ -170,7 +173,7 @@
 		                <c:url var="delUrl" value="/board/${result.boardIdNum}/delete${_BASE_PARAM}">
 		                    <c:param name="pageIndex" value="${searchVO.pageIndex}"/>
 		                </c:url>
-		                <a href="${delUrl}" id="btn-del" class="btn"><i class="ico-del"></i> 삭제</a>
+		                <button type="button" data-url="${delUrl}" class="btn-del" data-file-id="${result.atchFileId}">삭제</button>
 		            </td>
 	            </sec:authorize>
 			</tr>
@@ -181,6 +184,11 @@
 		</c:if>
 		</tbody>
 	</table>
+	<form id="delForm" action="#" method="post" style="display: none;">
+		<input type="hidden" name="registerId" value=""/>
+		<input type="hidden" name="atchFileId" value=""/>
+		<sec:csrfInput/>
+	</form>
 </div>
 
 <div style="padding: 0; display: flex; justify-content: center;">
@@ -240,7 +248,7 @@
 
 
 <%-- 검색 영역 --%>
-<form action="/board" method="post">
+<form action="/board" method="get">
 	<input type="hidden" name="pageUnit" value="${searchVO.recordCountPerPage}"/>
 	<fieldset>
 		<legend>검색</legend>
@@ -265,10 +273,16 @@ $(document).ready(function(){
 	});
 	
 	// 게시글 삭제
-	$('#btn-del').click(function() {
+	$('.btn-del').click(function() {
 		if (!confirm("삭제하시겠습니까?")) {
 			return false;
 		}
+		const delUrl = $(this).attr('data-url');
+		const fileId = $(this).attr('data-file-id');
+		
+		$('#delForm').attr('action', delUrl);
+		$('input[name = atchFileId]').val(fileId);
+		$('#delForm').submit();
 	});
 });
 </script>

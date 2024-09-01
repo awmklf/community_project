@@ -1,15 +1,13 @@
 package community.board.web;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -18,18 +16,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import community.board.service.BoardService;
 import community.board.service.BoardVO;
-import community.cmm.CommonService;
+import community.cmm.service.CommonService;
+import community.cmm.service.FileService;
+import community.cmm.service.FileVO;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -38,97 +36,21 @@ public class BoardController {
 
 	/** boardService DI */
 	@Autowired
-	BoardService boardService;
+	private BoardService boardService;
 	
 	/** commService DI */
 	@Autowired
-	CommonService cmmService;
+	private CommonService cmmService;
 	
-
-	
-
-	// 파일 업로드를 처리하는 메소드
-    @PostMapping("/board/uploadImage")
-    public void uploadImage(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    	String fileName = request.getHeader("file-name");
-        String fileSize = request.getHeader("file-size");
-        String fileType = request.getHeader("file-Type");
-    	
-    	// 파일 이름, 확장자 분리
-        String fileNamepre = fileName.substring(fileName.indexOf(".") - 1);
-        log.info("file Oriname : {}",fileNamepre);
-        String fileNameSuffix = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-        String[] suffixArr = {"jpg", "png", "bmp", "gif"};
-        
-        // 파일 확장자가 허용된 목록에 있는지 확인
-        int cnt = 0;
-        for (String suffix : suffixArr) {
-            if (fileNameSuffix.equals(suffix)) {
-                cnt++;
-                break;
-            }
-        }
-        
-        // 허용되지 않은 파일 확장자일 경우 에러 반환
-        if (cnt == 0) {
-            response.getWriter().println("NOTALLOW_" + fileName);
-            return;
-        }
-        
-        // 기본 경로 설정
-        String defaultPath = request.getSession().getServletContext().getRealPath("/");
-        String filePath = defaultPath + "resources" + File.separator + "img" + File.separator + "smarteditor2" + File.separator;
-        File file = new File(filePath);
-        
-        // 업로드 디렉토리가 없으면 생성
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        
-        // 새로운 파일 이름 생성
-        String autoFileName = UUID.randomUUID().toString() + fileName.substring(fileName.lastIndexOf("."));
-        String rFileName = filePath + autoFileName;
-        
-        // 파일을 업로드 디렉토리에 저장
-        try (InputStream is = request.getInputStream();
-             OutputStream os = new FileOutputStream(rFileName)) {
-            byte[] buffer = new byte[Integer.parseInt(request.getHeader("file-size"))];
-            int num;
-            while ((num = is.read(buffer)) != -1) {
-                os.write(buffer, 0, num);
-            }
-        }
-        
-        // 파일 정보 설정
-        String fileInfo = "&bNewLine=true";
-        fileInfo += "&sFileName=" + fileName;
-        fileInfo += "&sFileURL=/resources/img/smarteditor2/" + autoFileName;
-        // 파일 정보 반환
-        response.getWriter().println(fileInfo);
-        
-        log.info("fileName : {}", fileName);
-        log.info("fileInfo : {}", fileInfo);
-        log.info("fileSize : {}", fileSize);
-        log.info("fileType : {}", fileType);
-    }
-	
-	
-	// 스마트 에디터 이미지 업로드를 위한 시큐리티 csrf 발행
-	@ResponseBody
-	@GetMapping("/csrf-token")
-    public Map<String, String> getCsrfToken(HttpServletRequest request) {
-		Map<String, String> tokenMap = new HashMap<>();
-        CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
-        tokenMap.put("token", csrfToken.getToken());
-        tokenMap.put("headerName", csrfToken.getHeaderName());
-        return tokenMap;
-    }
-	
+	/** commService DI */
+	@Autowired
+	private FileService fileService;
 	
 
 	/** 게시글 목록 조회 */
-	@RequestMapping("/board")
+	@GetMapping("/board")
 	public String boardSelectList(@ModelAttribute("searchVO") BoardVO vo, HttpServletRequest req, ModelMap model) throws Exception {
+		
 		// 공지 영역 게시글
 		vo.setIsNotice("Y");
 		Map<String, Object> noticeResultList = boardService.selectBoardList(vo);
@@ -189,6 +111,7 @@ public class BoardController {
 	@PostMapping("/board/insert")
 	@PreAuthorize("isAuthenticated()")
 	public String insert(@ModelAttribute("searchVO") BoardVO vo, HttpServletRequest request) throws Exception {
+		
 		vo.setCreatIp(request.getRemoteAddr());
 		int resultBoardIdNum = boardService.insertBoard(vo);
 		return "redirect:/board/" + resultBoardIdNum;
@@ -226,6 +149,49 @@ public class BoardController {
 		}
 		map.put("recCnt", recCnt);
 		return map;
+	}
+	
+	/** 스마트에디터 이미지 업로드 */
+	@PostMapping("/board/uploadImage")
+	public void uploadImage(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String fileName = URLDecoder.decode(request.getHeader("file-name"), StandardCharsets.UTF_8.toString());
+		String fileNameSuffix = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+		String fileSize = request.getHeader("file-size");
+		String fileType = request.getHeader("file-Type");
+		String defaultPath = request.getSession().getServletContext().getRealPath("/");
+		String filePath = defaultPath + "image" + File.separator;
+
+		FileVO vo = new FileVO();
+		vo.setInputStream(request.getInputStream());
+		vo.setOrignlFileNm(fileName); // 파일 이름
+		vo.setFileExtsn(fileNameSuffix); // 파일 확장자
+		vo.setFileSize(fileSize); // 파일 사이즈
+		vo.setFileStreCours(filePath); // 파일 경로
+		
+		log.info("fileName : {}", vo.getOrignlFileNm());
+		log.info("fileType : {}", fileType);
+		log.info("fileNmSuff : {}", vo.getFileExtsn());
+		log.info("fileSize : {}", vo.getFileSize());
+		log.info("filePath : {}", vo.getFileStreCours());		
+
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if ("tempUniqueVal".equals(cookie.getName())) {
+					vo.setAtchFileId(cookie.getValue());
+					log.info("Temporary Unique Value: " + vo.getAtchFileId());
+					
+					String fileInfo = fileService.uploadImage(vo);
+					
+					// 파일 정보 반환
+					response.setCharacterEncoding("UTF-8");
+					response.getWriter().println(fileInfo);
+					log.info("fileInfo : {}", fileInfo);
+
+				}
+			}
+		}
+
 	}
 
 }

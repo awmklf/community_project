@@ -9,6 +9,7 @@
 <head>
 <meta charset="UTF-8">
 <sec:csrfMetaTags/>
+<link rel="icon" href="/img/favicon.png">
 <title>${param.title}</title>
 <style>
 	 body {
@@ -20,7 +21,8 @@
 	.container {
 	    max-width: 1100px;
 	    width: 100%;
-	    padding: 20px;
+	    margin: 5px 10px 5px;
+	    padding: 10px 20px 10px;
 	    box-sizing: border-box;
 	    border: 0px;
 	}

@@ -58,6 +58,7 @@ nhn.husky.SE2M_AttachQuickPhoto = jindo.$Class({
 	 * 팝업에서 호출되는 메세지.
 	 */
 	$ON_SET_PHOTO : function(aPhotoData){
+		console.log(aPhotoData);
 		var sContents, 
 			aPhotoInfo,
 			htData;
@@ -77,10 +78,11 @@ nhn.husky.SE2M_AttachQuickPhoto = jindo.$Class({
 				
 				aPhotoInfo = {
 				    sName : htData.sFileName || "",
+					sImageId : htData.sImageId, // 24.08.31 - 이미지 파일 아이디 삽입
 				    sOriginalImageURL : htData.sFileURL,
 					bNewLine : htData.bNewLine || false 
 				};
-				
+				console.log(aPhotoInfo);
 				sContents += this._getPhotoTag(aPhotoInfo);
 			}
 
@@ -96,9 +98,9 @@ nhn.husky.SE2M_AttachQuickPhoto = jindo.$Class({
 	 */
 	_getPhotoTag : function(htPhotoInfo){
 		// id와 class는 썸네일과 연관이 많습니다. 수정시 썸네일 영역도 Test
-		// 이미지 디폴트 크기 처리 수정
-		var sTag = '<img src="{=sOriginalImageURL}" title="{=sName}" style="width:auto; max-width:100%; height:auto;">';
-		
+		// 24.08.28 이미지 디폴트 크기 처리 수정
+		// 24.08.31 이미지 아이디 삽입
+		var sTag = '<img src="{=sOriginalImageURL}" title="{=sName}" data-image-id="{=sImageId}" style="width:auto; max-width:98%; height:auto;">';
 		if(htPhotoInfo.bNewLine){
 			sTag += '<br style="clear:both;">';
 		}
