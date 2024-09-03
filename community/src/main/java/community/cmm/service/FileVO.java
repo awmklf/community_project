@@ -8,9 +8,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 public class FileVO {
 	
 	private MultipartFile upFile;
@@ -18,7 +20,7 @@ public class FileVO {
 	/** 첨부파일ID */
 	private String atchFileId;
 	/** 첨부파일 순번 */
-	private Integer fileSn;
+	private String fileSn;
 	/** 첨부파일 생성일 */
 	private LocalDateTime creatDt;
 	/** 사용여부 */
@@ -40,5 +42,7 @@ public class FileVO {
 	ServletInputStream inputStream;
 	/** 이미지 체크용 게시글 내용 */
 	private String boardCn;
+	/** 게시글 사용 여부 */
+	private String useAtBoard;
 
 }

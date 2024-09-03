@@ -23,6 +23,7 @@ public class SchedulingConfig {
 	@Autowired
 	FileDAO fileDAO;
 
+	// 파일 정리 스케줄
 	@Scheduled(fixedRate = 3600000) // 1시간 3600.000 간격으로 실행 
 	public void cleanUpFiles() throws Exception {
 		FileVO vo = new FileVO();

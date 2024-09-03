@@ -181,8 +181,10 @@ public class BoardServiceImpl implements BoardService {
 		else if ("owner".equals(role))
 			vo.setUserId(authentication.getName());
 		FileVO fvo = new FileVO();
-		fvo.setBoardCn("");
-		fvo.setAtchFileId(vo.getAtchFileId());
+		BoardVO resultBoard = boardDAO.selectBoard(vo);
+		fvo.setBoardCn(resultBoard.getBoardCn());
+		fvo.setAtchFileId(resultBoard.getAtchFileId());
+		fvo.setUseAtBoard("N");
 		fileService.updateFileUseAt(fvo); // 첨부 삭제
 		boardDAO.deleteBoard(vo);
 	}

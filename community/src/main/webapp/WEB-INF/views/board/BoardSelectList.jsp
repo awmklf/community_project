@@ -10,6 +10,31 @@
 		<c:param name="title" value="커뮤니티"/>
 </c:import>
 
+<style>
+	.active {
+		font-weight: bold;
+		border-bottom: 4em solid #111;
+	}
+	
+	.post-title {
+		position: relative;
+	}
+	
+	.post-title .thumbnail {
+		display: none;
+		position: absolute;
+		bottom: 100%;
+		left: 0;
+		background-color: #fff;
+		/*             margin-bottom: 10px; /* 이미지와 제목 사이의 간격 */ */
+		z-index: 1000; /* 이미지가 맨 앞에 표시되도록 설정 */
+	}
+	
+	.post-title:hover .thumbnail {
+		display: block;
+	}
+</style>
+
 <%-- 기본 URL --%>
 <c:url var="_BASE_PARAM" value="">
 	<c:param name="pageUnit" value="${searchVO.recordCountPerPage}"/>
@@ -17,10 +42,32 @@
 	<c:if test="${not empty searchVO.searchCondition}"><c:param name="searchCondition" value="${searchVO.searchCondition}"/></c:if>
 	<c:if test="${not empty searchVO.searchKeyword}"><c:param name="searchKeyword" value="${searchVO.searchKeyword}"/></c:if>
 </c:url>
+
+
+<%-- 검색 영역 --%>
+<div style="">
+	<form action="/board" method="get">
+		<input type="hidden" name="pageUnit" value="${searchVO.recordCountPerPage}"/>
+		<input type="hidden" name="category" value="${searchVO.category}"/>
+		<label for="ftext" class="">검색분류선택</label>
+		<select name="searchCondition" id="ftext">
+			<option value="0" <c:if test="${searchVO.searchCondition eq '0'}">selected="selected"</c:if> >제목</option> 
+			<option value="1" <c:if test="${searchVO.searchCondition eq '1'}">selected="selected"</c:if> >내용</option> 
+			<option value="2" <c:if test="${searchVO.searchCondition eq '2'}">selected="selected"</c:if> >작성자</option> 
+		</select>
+		<label for="" class="">검색어입력</label>
+		<input name="searchKeyword" value="<c:out value="${searchVO.searchKeyword}"/>" type="text" class="" id="">
+		<span class=""><input type="submit" value="검색" title=""></span>
+	</form>
+</div>
+
+
+
 <div style="padding: 0; display: flex; justify-content: center;">
 	<%-- 게시글 목록 수 영역 --%>
 	<div style="border: 0px; margin: 0; margin-left: auto;">
 		<form id="pageSizeForm" action="/board" method="get">
+			<input type="hidden" name="category" value="${searchVO.category}"/>
 			<input type="hidden" name="searchCondition" value="${searchVO.searchCondition}"/>
 			<input type="hidden" name="searchKeyword" value="${searchVO.searchKeyword}"/>
 			<label for="selectRecord">게시글 표시</label>
@@ -31,38 +78,37 @@
 				<option value="30" ${searchVO.recordCountPerPage eq '30' ? 'selected' : ''} >30개</option>
 				<option value="50" ${searchVO.recordCountPerPage eq '50' ? 'selected' : ''} >50개</option>
 			</select>
-			<sec:csrfInput/>
 		</form>
 	</div>
-	<!-- 게시글 카테고리 -->
+	<%-- 게시글 카테고리 --%>
 	<div style="border: 0px; text-align: center; margin: 0 auto; position: absolute">
 		<c:url var="allPost" value="/board"/>
-		<a href="${allPost}" class="${empty param.category ? 'active' : 'inactive'}" style="border: 0;">전체</a>
+		<a href="${allPost}" class="${empty searchVO.category ? 'active' : 'inactive'}" style="border: 0;">전체</a>
 		|
 		<c:url var="recommendPost" value="/board">
 			<c:param name="category" value="-1"/>
 		</c:url>
-		<a href="${recommendPost}" class="${param.category == -1 ? 'active' : 'inactive'}" style="border: 0;">추천</a>
+		<a href="${recommendPost}" class="${searchVO.category == -1 ? 'active' : 'inactive'}" style="border: 0;">추천</a>
 		|
 		<c:url var="generalPost" value="/board">
 			<c:param name="category" value="1"/>
 		</c:url>
-		<a href="${generalPost}" class="${param.category == 1 ? 'active' : 'inactive'}" style="border: 0;">일반</a>
+		<a href="${generalPost}" class="${searchVO.category == 1 ? 'active' : 'inactive'}" style="border: 0;">일반</a>
 		|
 		<c:url var="infoPost" value="/board">
 			<c:param name="category" value="2"/>
 		</c:url>
-		<a href="${infoPost}" class="${param.category == 2 ? 'active' : 'inactive'}" style="border: 0;">정보</a>
+		<a href="${infoPost}" class="${searchVO.category == 2 ? 'active' : 'inactive'}" style="border: 0;">정보</a>
 		|
 		<c:url var="questionPosts" value="/board">
 			<c:param name="category" value="3"/>
 		</c:url>
-		<a href="${questionPosts}" class="${param.category == 3 ? 'active' : 'inactive'}" style="border: 0;">질문</a>
+		<a href="${questionPosts}" class="${searchVO.category == 3 ? 'active' : 'inactive'}" style="border: 0;">질문</a>
 		|
 		<c:url var="suggestionReportPost" value="/board">
 			<c:param name="category" value="4"/>
 		</c:url>
-		<a href="${suggestionReportPost}" class="${param.category == 4 ? 'active' : 'inactive'}" style="border: 0;">건의/신고</a>
+		<a href="${suggestionReportPost}" class="${searchVO.category == 4 ? 'active' : 'inactive'}" style="border: 0;">건의/신고</a>
 	</div>
 </div>
 <!-- 게시글 영역 -->
@@ -111,14 +157,14 @@
 				</td>
 			</tr>
 		</c:forEach>
-		<tr><td colspan="8"><hr></td></tr>
+		<tr><td colspan="8" style="padding: 0px;"><hr></td></tr>
 		<!-- 일반글 영역 -->
 		<c:forEach var="result" items="${resultList}" varStatus="status">
 			<tr>
 				<td class="num">
 					<c:out value="${paginationInfo.totalRecordCount - ((searchVO.pageIndex-1) * searchVO.pageUnit) - (status.index)}"/>
 				</td>
-				<td style="padding-left: 20px; text-align: left;">
+				<td style="padding-left: 20px; text-align: left;" class="post-title">
 					<c:choose>
 						<c:when test="${result.category == 1}">
 							<c:set var="categoryName" value="[일반]"/>
@@ -146,6 +192,9 @@
 						</c:if>
 						<c:out value="${result.boardSj} [${result.replyCnt}]"/>
 					</a>
+					<c:if test="${not empty result.streFileNm}">
+						<img src="/image/thumbnail/${result.streFileNm}.${result.fileExtsn}" alt="${result.boardSj}" class="thumbnail">
+					</c:if>
 				</td>
 				<td>
 					<c:out value="${result.nickname}"/>
@@ -246,24 +295,6 @@
 </div>
 
 
-
-<%-- 검색 영역 --%>
-<form action="/board" method="get">
-	<input type="hidden" name="pageUnit" value="${searchVO.recordCountPerPage}"/>
-	<fieldset>
-		<legend>검색</legend>
-		<label for="ftext" class="">검색분류선택</label>
-		<select name="searchCondition" id="ftext">
-			<option value="0" <c:if test="${searchVO.searchCondition eq '0'}">selected="selected"</c:if> >제목</option> 
-			<option value="1" <c:if test="${searchVO.searchCondition eq '1'}">selected="selected"</c:if> >내용</option> 
-			<option value="2" <c:if test="${searchVO.searchCondition eq '2'}">selected="selected"</c:if> >작성자</option> 
-		</select>
-		<label for="" class="">검색어입력</label>
-		<input name="searchKeyword" value="<c:out value="${searchVO.searchKeyword}"/>" type="text" class="" id="">
-		<span class=""><input type="submit" value="검색" title=""></span>
-	</fieldset>
-	<sec:csrfInput/>
-</form>
 
 <script>
 $(document).ready(function(){

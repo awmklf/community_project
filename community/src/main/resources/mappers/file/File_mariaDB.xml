@@ -2,8 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="community.cmm.service.FileDAO">
 
-
-
 <!-- 첨부파일리스트 조회 쿼리 -->
 <select id="selectFileList" resultType="FileVO">
 	SELECT
@@ -35,6 +33,65 @@
 		</choose>
 		<if test='atchFileId != null and atchFileId != "" and atchFileId != "schedule"'>
 			AND ATCH_FILE_ID = #{atchFileId}
+		</if>
+		<choose>
+			<when test='fileSn == "0"'>
+				AND FILE_SN = 0
+			</when>
+			<otherwise>
+				AND FILE_SN >= 1
+			</otherwise>
+		</choose>
+</select>
+
+<!-- 파일 조회 쿼리 -->
+<select id="selectFile" resultType="FileVO">
+	SELECT
+		ATCH_FILE_ID
+		, FILE_SN
+		, CREAT_DT
+		, USE_AT
+		, DELETED_AT
+		, FILE_STRE_COURS
+		, STRE_FILE_NM
+		, ORIGNL_FILE_NM
+		, FILE_EXTSN
+		, FILE_SIZE
+	FROM FILE
+	WHERE 
+		<choose>
+			<when test='useAt == "Y"'>
+				USE_AT = 'Y'
+			</when>
+			<when test='useAt == "N"'>
+				USE_AT = 'N'
+			</when>
+			<when test='useAt == "schedule"'>
+				USE_AT != 'Y'
+			</when>
+			<when test='useAt == "any"'>
+				USE_AT != 'A'
+			</when>
+			<otherwise>
+				USE_AT != 'N'
+			</otherwise>
+		</choose>
+		<choose>
+			<when test='atchFileId != null and atchFileId != ""'>
+				AND ATCH_FILE_ID = #{atchFileId}
+			</when>
+			<when test='atchFileId == "schedule"'>
+			</when>
+			<otherwise>
+				AND ATCH_FILE_ID IS NULL
+			</otherwise>
+		
+		</choose>
+		<if test='fileSn != null and fileSn != ""'>
+			AND FILE_SN = ${fileSn}
+		</if>
+		<if test='fileSn == "0"'>
+			AND FILE_SN = 0
 		</if>
 </select>
 
@@ -71,6 +128,23 @@
 	)	
 </insert>
 
+<!-- 첨부파일 업데이트 쿼리 -->
+<update id="updateFile">
+	UPDATE FILE SET
+		CREAT_DT = NOW()
+		, USE_AT = #{useAt}
+		, FILE_STRE_COURS = #{fileStreCours}
+		, STRE_FILE_NM = #{streFileNm}
+		, ORIGNL_FILE_NM = #{orignlFileNm}
+		, FILE_EXTSN = #{fileExtsn}
+		, FILE_SIZE = #{fileSize}
+	WHERE ATCH_FILE_ID = #{atchFileId}
+		AND FILE_SN = #{fileSn}
+</update>
+
+
+
+<!-- 첨부파일 사용여부 업데이트 쿼리 -->
 <update id="updateUseAt">
 	UPDATE FILE SET 
 		USE_AT = #{useAt}

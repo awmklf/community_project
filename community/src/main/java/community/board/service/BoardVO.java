@@ -60,5 +60,9 @@ public class BoardVO extends ComPageVO {
 	private Integer fileSn;
 	/** 게시글 이미지 포함 확인 */
 	private Integer chkImage;
+	/** 첨부파일 저장이름 */
+	private String streFileNm;
+	/** 첨부파일 확장자 */
+	private String fileExtsn;
 
 }

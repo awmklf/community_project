@@ -14,6 +14,7 @@
 <c:url var="_BASE_PARAM" value="">
 	<c:param name="pageIndex" value="${searchVO.pageIndex}"/>
 	<c:param name="pageUnit" value="${searchVO.pageUnit}"/>
+	<c:if test="${not empty searchVO.category}"><c:param name="category" value="${searchVO.category}"/></c:if>
 	<c:if test="${not empty searchVO.searchCondition}"><c:param name="searchCondition" value="${searchVO.searchCondition}"/></c:if>
 	<c:if test="${not empty searchVO.searchKeyword}"><c:param name="searchKeyword" value="${searchVO.searchKeyword}"/></c:if>
 </c:url>

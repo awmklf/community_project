@@ -25,6 +25,7 @@
 	    padding: 10px 20px 10px;
 	    box-sizing: border-box;
 	    border: 0px;
+	    background-color: #edede9;
 	}
 	table {
 		width: 100%;
@@ -75,13 +76,14 @@
 </head>
 <body>
 	<div class="container">
-	<h1 style="margin-top: 5px; margin-bottom: 30px;">COMMUNITY</h1>
-	<header class="">
-		<div class="">
-			<a href="/">HOME</a> |
+	<header class="" style="height: 100px; display: flex; justify-content: center;">
+		<div style="border: 0px; text-align: center; margin: 0 auto; position: absolute; background-color:transparent;">
+			<h1 style="margin-top: 15px;"><a href="/" style="text-decoration: none; border: none;">COMMUNITY</a></h1>
+		</div>
+		<div class="" style="border: 0px; margin: 0; margin-left: auto; background-color:transparent;">
 			<c:choose>
 				<c:when test="${empty userId}">
-					<a href="/user/login">로그인</a> | <a href="${url}/signup">회원가입</a>
+					<a href="/user/login">로그인</a> | <a href="/user/signup">회원가입</a>
 				</c:when>
 				<c:otherwise>
 					<strong><c:out value="${nickname}"/></strong>님 환영합니다 |

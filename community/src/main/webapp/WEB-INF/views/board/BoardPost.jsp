@@ -178,6 +178,14 @@ window.addEventListener('beforeunload', function() {
 			}
 		});
 		
+		// 제목칸 엔터 이벤트 방지
+		$("#boardSj").keydown(function(event) {
+		    if (event.key === "Enter") {
+		        event.preventDefault();
+		        return false;
+		    }
+		});
+		
 		// 미입력 방지
 		function regist() {
 			if (!$("#boardSj").val().trim()) {

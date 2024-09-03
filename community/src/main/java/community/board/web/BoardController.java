@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -110,8 +111,11 @@ public class BoardController {
 	/** 게시글 작성 */
 	@PostMapping("/board/insert")
 	@PreAuthorize("isAuthenticated()")
-	public String insert(@ModelAttribute("searchVO") BoardVO vo, HttpServletRequest request) throws Exception {
-		
+	public String insert(@ModelAttribute("searchVO") BoardVO vo, HttpServletRequest request, HttpSession session) throws Exception {
+		if (!StringUtils.hasText(vo.getBoardSj().trim()) || !StringUtils.hasText(vo.getBoardCn().trim())) {
+			session.setAttribute("message", "게시글 작성중 문제가 발생하였습니다.");
+			return "redirect:/";
+		}
 		vo.setCreatIp(request.getRemoteAddr());
 		int resultBoardIdNum = boardService.insertBoard(vo);
 		return "redirect:/board/" + resultBoardIdNum;
