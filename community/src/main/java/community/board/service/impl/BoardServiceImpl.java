@@ -62,10 +62,29 @@ public class BoardServiceImpl implements BoardService {
 
 			resultMap.put("pagination", pgCalc);
 		}
+		vo.setSearchKeywords(handleSearchKeywords(vo)); // 검색 키워드 처리
 		List<BoardVO> resultList = boardDAO.selectBoardList(vo);
 		resultMap.put("resultList", resultList);
 		return resultMap;
 
+	}
+	
+	/** 검색 키워드 핸들러 */
+	@Override
+	public String[] handleSearchKeywords (BoardVO vo) throws Exception {
+		String replaceResult = vo.getSearchKeyword().replaceAll("&", "&amp;")
+						        .replaceAll("<", "&lt;")
+						        .replaceAll(">", "&gt;")
+						        .replaceAll("\"", "&quot;")
+						        .replaceAll("'", "&#039;")
+						        ;
+		if ("3".equals(vo.getSearchCondition()) ) { // 작성자 검색의 경우 스플릿 패스
+			String[] result = new String[1];
+			result[0] = replaceResult;
+			return result;
+		}
+		return replaceResult.split(" ");
+		
 	}
 
 	/** 페이지네이션 */

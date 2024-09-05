@@ -16,4 +16,10 @@ public interface FileService {
 
 	/** 업로드 파일 상태정보 수정 */
 	String updateFileUseAt(FileVO vo) throws Exception;
+	
+	/** 썸네일 작업 */
+	public FileVO thumbnail(FileVO vo) throws Exception;
+	
+	/** 썸네일 DB 정보 갱신 */
+	public void updateThumbnail (FileVO vo) throws Exception;
 }

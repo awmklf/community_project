@@ -42,7 +42,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>500 - 문제가 발생하였습니다.</h1>
+        <h1>500 INTERNAL SERVER ERROR - 서버에 문제가 발생하였습니다.</h1>
         <h2>관리자에게 문의 바랍니다.</h2>
         <a href="/">홈으로 돌아가기</a>
     </div>

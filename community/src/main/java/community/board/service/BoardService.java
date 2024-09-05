@@ -8,6 +8,9 @@ public interface BoardService {
 
 	/** 게시글 목록 조회 */
 	public Map<String, Object> selectBoardList(BoardVO vo) throws Exception;
+	
+	/** 검색 키워드 핸들러 */
+	public String[] handleSearchKeywords (BoardVO vo) throws Exception;
 
 	/** 페이지네이션 */
 	public PaginationCalc pagination(BoardVO vo) throws Exception;

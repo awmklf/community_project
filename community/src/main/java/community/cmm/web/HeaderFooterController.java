@@ -2,7 +2,6 @@ package community.cmm.web;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -49,17 +48,6 @@ public class HeaderFooterController {
 		tokenMap.put("token", csrfToken.getToken());
 		tokenMap.put("headerName", csrfToken.getHeaderName());
 		return tokenMap;
-	}
-
-	/** 이미지 업로드를 위한 임시아이디 */
-	@ResponseBody
-	@GetMapping("/temp-id")
-	public HashMap<String, Object> getTempImageId() throws Exception {
-		HashMap<String, Object> map = new HashMap<String, Object>();
-
-		map.put("tempImageId", UUID.randomUUID().toString());
-
-		return map;
 	}
 
 }

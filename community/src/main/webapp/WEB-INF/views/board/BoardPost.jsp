@@ -18,6 +18,14 @@
 	<c:if test="${not empty searchVO.searchKeyword}"><c:param name="searchKeyword" value="${searchVO.searchKeyword}"/></c:if>
 </c:url>
 
+<style>
+	#boardSj {
+		width: 300px;
+		height: 30px;
+		pause: 0px;
+	}
+</style>
+
 <%-- 등록, 수정 url --%>
 <c:choose>
 	<c:when test="${not empty searchVO.boardIdNum}">
@@ -35,13 +43,13 @@
 		<input type="hidden" name="registerId" value="${result.registerId}">
 		<input type="hidden" name="atchFileId" id="atchFileId" value="${result.atchFileId}">
 		<div style="text-align: left;">
-			<select id="" name="category">
+			<select id="" name="category" style="height: 34px;">
 				<option value="1" ${result.category eq '1' ? 'selected' : ''}>일반</option>
 				<option value="2" ${result.category eq '2' ? 'selected' : ''}>정보</option>
 				<option value="3" ${result.category eq '3' ? 'selected' : ''}>질문</option>
 				<option value="4" ${result.category eq '4' ? 'selected' : ''}>건의&신고</option>
 			</select>
-			<input type="text" name="boardSj" id="boardSj" title="제목" class="" placeholder="제목" value="<c:out value="${result.boardSj}"/>">
+			<input type="text" name="boardSj" id="boardSj" title="제목" class="" placeholder="제목" value="<c:out value="${result.boardSj}"/>" maxlength="20">
 		</div>
 		<sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')">
 			<div style="text-align: left;">

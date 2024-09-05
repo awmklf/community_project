@@ -53,7 +53,8 @@
 		<select name="searchCondition" id="ftext">
 			<option value="0" <c:if test="${searchVO.searchCondition eq '0'}">selected="selected"</c:if> >제목</option> 
 			<option value="1" <c:if test="${searchVO.searchCondition eq '1'}">selected="selected"</c:if> >내용</option> 
-			<option value="2" <c:if test="${searchVO.searchCondition eq '2'}">selected="selected"</c:if> >작성자</option> 
+			<option value="2" <c:if test="${searchVO.searchCondition eq '2'}">selected="selected"</c:if> >제목+내용</option> 
+			<option value="3" <c:if test="${searchVO.searchCondition eq '3'}">selected="selected"</c:if> >작성자</option> 
 		</select>
 		<label for="" class="">검색어입력</label>
 		<input name="searchKeyword" value="<c:out value="${searchVO.searchKeyword}"/>" type="text" class="" id="">

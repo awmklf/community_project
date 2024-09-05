@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,6 +48,9 @@ public class BoardController {
 	/** commService DI */
 	@Autowired
 	private FileService fileService;
+	
+	@Value("${Globals.ImagePath}")
+	private String uploadDir;
 	
 
 	/** 게시글 목록 조회 */
@@ -155,9 +160,22 @@ public class BoardController {
 		return map;
 	}
 	
+	
+	/** 이미지 업로드를 위한 임시아이디 */
+	@ResponseBody
+	@GetMapping("/temp-id")
+	public HashMap<String, Object> getTempImageId() throws Exception {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+
+		map.put("tempImageId", UUID.randomUUID().toString());
+
+		return map;
+	}
+	
 	/** 스마트에디터 이미지 업로드 */
 	@PostMapping("/board/uploadImage")
 	public void uploadImage(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// 파일 정보 가져오기
 		String fileName = URLDecoder.decode(request.getHeader("file-name"), StandardCharsets.UTF_8.toString());
 		String fileNameSuffix = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
 		String fileSize = request.getHeader("file-size");
@@ -165,6 +183,7 @@ public class BoardController {
 		String defaultPath = request.getSession().getServletContext().getRealPath("/");
 		String filePath = defaultPath + "image" + File.separator;
 
+		// vo에 담기
 		FileVO vo = new FileVO();
 		vo.setInputStream(request.getInputStream());
 		vo.setOrignlFileNm(fileName); // 파일 이름
@@ -176,16 +195,19 @@ public class BoardController {
 		log.info("fileType : {}", fileType);
 		log.info("fileNmSuff : {}", vo.getFileExtsn());
 		log.info("fileSize : {}", vo.getFileSize());
-		log.info("filePath : {}", vo.getFileStreCours());		
+		log.info("filePath : {}", vo.getFileStreCours());
 
+		// 이미지 업로드 진행
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
 				if ("tempUniqueVal".equals(cookie.getName())) {
+					
+					// 이미지 사전 업로드 파일 아이디를 위한 쿠키
 					vo.setAtchFileId(cookie.getValue());
 					log.info("Temporary Unique Value: " + vo.getAtchFileId());
 					
-					String fileInfo = fileService.uploadImage(vo);
+					String fileInfo = fileService.uploadImage(vo); // 업로드
 					
 					// 파일 정보 반환
 					response.setCharacterEncoding("UTF-8");

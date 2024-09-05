@@ -21,6 +21,9 @@ public class ComPageVO implements Serializable {
 
     /** 검색 키워드 */
     private String searchKeyword = "";
+    
+    /** 검색 키워드 분리 */
+    String[] searchKeywords;
 
     /** 현재페이지 */
     private int pageIndex = 1;

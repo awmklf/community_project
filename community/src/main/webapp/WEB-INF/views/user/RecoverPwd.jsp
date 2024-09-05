@@ -10,6 +10,10 @@
 <meta charset="UTF-8">
 <sec:csrfMetaTags/>
 <link rel="icon" href="/img/favicon.png">
+<link rel="icon" href="/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap" rel="stylesheet">
 <title>비밀번호 변경 - 커뮤니티</title>
 <style>
 	body {
@@ -18,6 +22,11 @@
 		padding: 0;
 		display: flex;
 		justify-content: center;
+		font-family: "Noto Sans KR", sans-serif;
+		font-optical-sizing: auto;
+		font-weight : < weight >;
+		font-style: normal;
+		font-weight: <weight>;
 	}
 	
 	.container {
@@ -134,11 +143,11 @@
 					<label for="pwd">변경할 비밀번호 : </label>
 				</div>
 				<div style="border: none; position: relative;">
-					<input type="password" name="password" id="pwd" placeholder="비밀번호(8자 이상, 영문+숫자 포함)">
+					<input type="password" name="password" id="pwd">
 					<img src="/img/ico-hide.png" id="togglePwd" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); cursor: pointer;">
 				</div>
 			</div>
-				<br><span id="pwdMsg" class="msg"></span>
+				<br><span id="pwdMsg" class="msg">비밀번호 : 8자 이상이어야 하며 영문자, 숫자, 특수문자 중 두 가지 이상의 조합이어야 합니다. 연속된 4개의 같은 문자는 사용불가능 합니다.</span>
 				<br><button type="submit" class="btn" style="margin: 10px auto">변경</button>
 				<sec:csrfInput/>
 			</form>
@@ -230,10 +239,7 @@ $(document).ready(function(){
 	}
 	
 	
-	// 비밀번호 필드 메세지 초기화
-    $("#pwd").keydown(function() {
-    	$('#pwdMsg').html("");
-    });
+	
 	// 변경할 비밀번호 제출 유효성 검사 실행
 	$("#changePwdForm").on("submit", async function(event) {
 		event.preventDefault();  // 폼 제출 방지
@@ -249,6 +255,7 @@ $(document).ready(function(){
 				}
 			});
 			if(status.pwdStatus == "green") { // 유효성 통과
+				$('#pwdMsg').html("");
 				if(confirm("비밀번호 변경을 진행하시겠습니까?")) {
 					$("#allowPwdChange").val("Y");
 					$("#changePwdForm").off('submit').submit(); // 폼 제출
@@ -256,8 +263,8 @@ $(document).ready(function(){
 			} else if (status.pwdStatus == "null") {  // 비밀번호 미입력
 				$('#pwdMsg').css("color", "red").html("비밀번호를 입력해 주세요.");
 				$("#pwdNullMsg").show();
-			} else if (status.pwdStatus == "valid") { // 8자 이상 영문과 숫자 혼합, 동일 문자 4개 미만 미충족
-				$('#pwdMsg').css("color", "red").html("8자 이상, 영문+숫자 포함, 동일 문자 4개 미만 미충족");
+			} else if (status.pwdStatus == "valid") { // 8자 이상 영문, 숫자, 두 종류 이상 조합, 동일 문자 4개 미만
+				$('#pwdMsg').css("color", "red").html("비밀번호 : 8자 이상이어야 하며 영문자, 숫자, 특수문자 중 두 가지 이상의 조합이어야 합니다. 연속된 4개의 같은 문자는 사용불가능 합니다.");
 			}
 		} catch (error) {
 			console.error(error);

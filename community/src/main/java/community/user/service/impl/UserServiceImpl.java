@@ -105,8 +105,8 @@ public class UserServiceImpl implements UserService {
 	public String checkPassword(UserVO vo) throws Exception {
 		// 필드 빈칸 확인
 		if (StringUtils.hasText(vo.getPassword())) {
-			// 8자 이상, 동일한 문자가 4개 미만, 영문과 숫자가 적어도 하나씩 포함된 문자열
-			Pattern pattern = Pattern.compile("^(?!.*(.)\\1{3,})(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$");
+			// 8자 이상이면서 영문, 숫자, 특수문자 중 두 종류 이상 포함된 문자열, 동일한 문자가 4개 미만
+			Pattern pattern = Pattern.compile("^(?!.*(.)\\1{3,})(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])|(?=.*[a-zA-Z])(?=.*\\d)|(?=.*[!@#$%^*+=-])(?=.*\\d)|(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*\\d)[A-Za-z\\d!@#$%^&*]{8,}$");
 			Matcher matcher = pattern.matcher(vo.getPassword());
 			if (matcher.find()) {
 				return "green"; // 사용가능

@@ -58,7 +58,7 @@
 		, FILE_EXTSN
 		, FILE_SIZE
 	FROM FILE
-	WHERE 
+	<where> 
 		<choose>
 			<when test='useAt == "Y"'>
 				USE_AT = 'Y'
@@ -66,15 +66,15 @@
 			<when test='useAt == "N"'>
 				USE_AT = 'N'
 			</when>
-			<when test='useAt == "schedule"'>
+			<when test='useAt == "T"'>
+				USE_AT = 'T'
+			</when>
+			<when test='useAt == "!Y"'>
 				USE_AT != 'Y'
 			</when>
-			<when test='useAt == "any"'>
-				USE_AT != 'A'
-			</when>
-			<otherwise>
+			<when test='useAt == "!N"'>
 				USE_AT != 'N'
-			</otherwise>
+			</when>
 		</choose>
 		<choose>
 			<when test='atchFileId != null and atchFileId != ""'>
@@ -85,7 +85,6 @@
 			<otherwise>
 				AND ATCH_FILE_ID IS NULL
 			</otherwise>
-		
 		</choose>
 		<if test='fileSn != null and fileSn != ""'>
 			AND FILE_SN = ${fileSn}
@@ -93,6 +92,7 @@
 		<if test='fileSn == "0"'>
 			AND FILE_SN = 0
 		</if>
+	</where>
 </select>
 
 <!-- 첨부파일 마지막 번호 조회 쿼리 -->

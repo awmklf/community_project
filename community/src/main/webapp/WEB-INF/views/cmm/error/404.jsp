@@ -38,7 +38,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>404 - 페이지를 찾을 수 없습니다.</h1>
+        <h1>404 NOT FOUND - 페이지를 찾을 수 없습니다.</h1>
         <a href="/">홈으로 돌아가기</a>
     </div>
 </body>

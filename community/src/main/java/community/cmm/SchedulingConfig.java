@@ -28,21 +28,23 @@ public class SchedulingConfig {
 	public void cleanUpFiles() throws Exception {
 		FileVO vo = new FileVO();
 		vo.setUseAt("schedule");
-		vo.setAtchFileId("schedule");
+		vo.setAtchFileId("!Y");
 		log.info("UseAt: {}", vo.getUseAt());
 		List<FileVO> resultList = fileDAO.selectFileList(vo);
 		for (FileVO result : resultList) {
 			File file = new File(result.getFileStreCours() + result.getStreFileNm());
+			LocalDateTime creatDt = result.getCreatDt();
+			LocalDateTime now = LocalDateTime.now();
+			Duration duration = Duration.between(creatDt, now);
+			
 			if ("N".equals(result.getUseAt())) {
-				if (file.exists()) {
-					file.delete();
-					log.info("삭제 파일 존재 확인 : {}",result.getFileStreCours() + result.getStreFileNm());
+				if (duration.toHours() >= 24) {
+					if (file.exists()) {
+						file.delete();
+						log.info("삭제 파일 존재 확인 : {}",result.getFileStreCours() + result.getStreFileNm());
+					}
 				}
 			} else if ("T".equals(result.getUseAt())) {
-				LocalDateTime creatDt = result.getCreatDt();
-				LocalDateTime now = LocalDateTime.now();
-				Duration duration = Duration.between(creatDt, now);
-				log.info("차이나는 시간 : {}", duration.toHours());
 				if (duration.toHours() >= 1) { // 1시간 이상 차이나는 경우
 					if (file.exists()) {
 						file.delete();

@@ -10,6 +10,10 @@
 <meta charset="UTF-8">
 <sec:csrfMetaTags/>
 <link rel="icon" href="/img/favicon.png">
+<link rel="icon" href="/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap" rel="stylesheet">
 <title>회원가입 - 커뮤니티</title>
 <style>
 	body {
@@ -18,6 +22,11 @@
 		padding: 0;
 		display: flex;
 		justify-content: center;
+		font-family: "Noto Sans KR", sans-serif;
+		font-optical-sizing: auto;
+		font-weight : < weight >;
+		font-style: normal;
+		font-weight: <weight>;
 	}
 	
 	.container {
@@ -67,7 +76,7 @@
 	
 	select {
 		width: 258px;
-		height: 34px;
+		height: 36px;
 	}
 	
 	#btn {
@@ -91,7 +100,7 @@
 						<label for="id">아이디</label>
 					</div>
 					<div style="border: none;">
-						<input type="text" name="userId" id="id"placeholder="아이디(5~20자의 영문 소문자, 숫자)" maxlength="20">
+						<input type="text" name="userId" id="id" maxlength="20">
 					</div>
 				</div>
 
@@ -100,7 +109,7 @@
 						<label for="nickname">닉네임</label>
 					</div>
 					<div style="border: none;">
-						<input type="text" name="nickname" id="nickname" placeholder="닉네임(2~10자의 한글, 영문, 숫자)" maxlength="10">
+						<input type="text" name="nickname" id="nickname" maxlength="10">
 					</div>
 				</div>
 				
@@ -109,7 +118,7 @@
 						<label for="pwd">비밀번호</label>
 					</div>
 					<div style="border: none; position: relative;">
-						<input type="password" name="password" id="pwd" placeholder="비밀번호(8자 이상, 영문+숫자 포함)" style="display: flex; justify-content: center;">
+						<input type="password" name="password" id="pwd" style="display: flex; justify-content: center;">
 						<img src="/img/ico-hide.png" id="togglePwd" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); cursor: pointer;">
 					</div>
 				</div>
@@ -134,7 +143,7 @@
 						<label for="customHint">직접입력</label>
 					</div>
 					<div style="border: none;">
-						<input type="text" name="" id="customHint" placeholder="비밀번호 찾기 시 질문">
+						<input type="text" name="" id="customHint" placeholder="비밀번호 찾기 질문">
 					</div>
 				</div>
 				
@@ -143,7 +152,7 @@
 						<label for="pwdCnsr">비밀번호 답</label>
 					</div>
 					<div style="border: none;">
-						<input type="text" name="passwordCnsr" id="pwdCnsr" placeholder="비밀번호 찾기 시 답변">
+						<input type="text" name="passwordCnsr" id="pwdCnsr">
 					</div>
 				</div>
 			<br><span id="idMsg" class="msg"></span>
@@ -281,8 +290,8 @@ $(document).ready(function(){
 				$('#pwdMsg').css("color", "green").html("비밀번호 : 사용할 수 있습니다.");
 			} else if (response.pwdStatus == "null") { // 비밀번호 미입력
 				$('#pwdMsg').css("color", "red").html("비밀번호 : 필수 정보입니다.");
-			} else if (response.pwdStatus == "valid") { // 8자 이상 영문과 숫자 혼합, 동일 문자 4개 미만 미충족
-				$('#pwdMsg').css("color", "red").html("비밀번호 : 8자 이상, 영문+숫자 포함, 동일 문자 4개 미만 미충족");
+			} else if (response.pwdStatus == "valid") { // 8자 이상 영문, 숫자, 두 종류 이상 조합, 동일 문자 4개 미만
+				$('#pwdMsg').css("color", "red").html("비밀번호 : 8자 이상이어야 하며 영문자, 숫자, 특수문자 중 두 가지 이상의 조합이어야 합니다. 연속된 4개의 같은 문자는 사용불가능 합니다.");
 			} else {
 				$('#pwdMsg').html("");
 			}

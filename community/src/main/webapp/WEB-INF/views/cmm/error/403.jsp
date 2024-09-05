@@ -30,7 +30,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>403 - 접근이 거부되었습니다.</h1>
+        <h1>403 Forbidden - 접근이 거부되었습니다.</h1>
         <a href="/">홈으로 돌아가기</a>
     </div>
 </body>
