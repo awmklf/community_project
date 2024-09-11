@@ -353,9 +353,9 @@
 	}
 
 	// 24.08.27 - 스프링 시큐리티 토큰을 가져오기 위한 함수 추가
-	var token = '';
-	var header = '';
 	function getCsrfToken() {
+		token = '';
+		header = '';
 		var xhr = new XMLHttpRequest();
 		xhr.open('GET', '/csrf-token', true);
 		xhr.onreadystatechange = function() {

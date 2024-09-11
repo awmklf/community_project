@@ -148,7 +148,7 @@ public class FileServiceImpl implements FileService {
 		log.info("썸네일 원본 이미지 정보 가져오기 완료");
 
 		// 썸네일 생성할 폴더, 파일명 세팅
-		vo.setFileStreCours(preFile.getFileStreCours() + "thumbnail" + File.separator);
+		vo.setFileStreCours(preFile.getFileStreCours() + "thumbnail/");
 		File file = new File(vo.getFileStreCours());
 		if (!file.exists()) {
 			file.mkdirs();

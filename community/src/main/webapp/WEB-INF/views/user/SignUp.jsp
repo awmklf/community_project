@@ -41,7 +41,7 @@
 	}
 	
 	form {
-		height: 400px;
+		height: 470px;
 	}
 	
 	div {

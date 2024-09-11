@@ -32,5 +32,8 @@ public interface BoardService {
 
 	/** 게시글 추천 */
 	public int updateBoardRecCnt(BoardVO vo) throws Exception;
+	
+	/** 게시글 상태 변경 */
+	public void udtStatusBoard(BoardVO vo) throws Exception;
 
 }

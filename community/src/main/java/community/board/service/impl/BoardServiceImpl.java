@@ -84,7 +84,6 @@ public class BoardServiceImpl implements BoardService {
 			return result;
 		}
 		return replaceResult.split(" ");
-		
 	}
 
 	/** 페이지네이션 */
@@ -228,6 +227,17 @@ public class BoardServiceImpl implements BoardService {
 			return boardDAO.viewBoardRecCnt(vo);
 		}
 		return -1;
+	}
+	
+	/** 게시글 상태 변경 */
+	@Override
+	public void udtStatusBoard(BoardVO vo) throws Exception {
+		vo.setBoardId(convertNumToBoardId(vo.getBoardIdNum()));
+		// 관리자(매니저 포함) 인증
+		String role = roleChk(vo.getRegisterId());
+		if ("admin".equals(role) || "manager".equals(role))
+			vo.setMngAt("Y");
+		boardDAO.udtStatusBoard(vo);
 	}
 
 }

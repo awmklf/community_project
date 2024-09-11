@@ -75,6 +75,7 @@
 			<textarea id="boardCn" name="boardCn" cols="120" rows="30" title="내용입력" style="display: none; width: 100%;"><c:out value="${result.boardCn}"/></textarea>
 			<script id="smartEditor" type="text/javascript"> 
 				var oEditors = [];
+// 				var aAdditionalFontSet = [["나눔고딕", "나눔고딕"]];
 				nhn.husky.EZCreator.createInIFrame({
 				    oAppRef: oEditors
 				    , elPlaceHolder: "boardCn" //textarea ID 입력
@@ -84,6 +85,7 @@
 				        bUseToolbar : true // 툴바 사용 여부 (true:사용/ false:사용하지 않음) 
 				        , bUseVerticalResizer : true // 입력창 크기 조절바 사용 여부 (true:사용/ false:사용하지 않음) 
 				        , bUseModeChanger : true // 모드 탭(Editor | HTML | TEXT) 사용 여부 (true:사용/ false:사용하지 않음) 
+// 						, aAdditionalFontList : aAdditionalFontSet	// 추가 글꼴 목록
 				        , fOnBeforeUnload: function() {
 							// 로드 전에 실행할 코드
 						}

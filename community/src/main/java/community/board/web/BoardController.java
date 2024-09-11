@@ -1,6 +1,5 @@
 package community.board.web;
 
-import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -133,6 +132,16 @@ public class BoardController {
 		boardService.updateBoard(vo);
 		return "redirect:/board/" + vo.getBoardIdNum();
 	}
+	
+	/** 게시글 상태 변경 */
+	@PostMapping("/board/{boardIdNum}/update-status")
+	@PreAuthorize("isAuthenticated()")
+	public String updateStatus(@ModelAttribute("searchVO") BoardVO vo, HttpServletRequest req) throws Exception {
+		System.out.println("1 : " + vo.getCategory());
+		System.out.println("2 : " + vo.getOthbcAt());
+		boardService.udtStatusBoard(vo);
+		return "redirect:" + req.getHeader("Referer");
+	}
 
 	/** 게시글 삭제 */
 	@PostMapping("/board/{boardIdNum}/delete")
@@ -180,8 +189,10 @@ public class BoardController {
 		String fileNameSuffix = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
 		String fileSize = request.getHeader("file-size");
 		String fileType = request.getHeader("file-Type");
-		String defaultPath = request.getSession().getServletContext().getRealPath("/");
-		String filePath = defaultPath + "image" + File.separator;
+//		String defaultPath = request.getSession().getServletContext().getRealPath("/");
+		String defaultPath = uploadDir;
+//		String filePath = defaultPath + "image" + File.separator;
+		String filePath = defaultPath;
 
 		// vo에 담기
 		FileVO vo = new FileVO();

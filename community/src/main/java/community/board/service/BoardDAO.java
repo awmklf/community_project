@@ -44,4 +44,7 @@ public interface BoardDAO {
 	
 	/** 게시글 추천 정보 갱신 */
 	public void updateRecommend(BoardVO vo) throws Exception;
+	
+	/** 게시글 상태 변경 */
+	public void udtStatusBoard(BoardVO vo) throws Exception;
 }

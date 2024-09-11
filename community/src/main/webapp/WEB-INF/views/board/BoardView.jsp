@@ -10,6 +10,13 @@
 		<c:param name="title" value="${result.boardSj} - 커뮤니티"/>
 </c:import>
 
+<sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')" var="mngRole"/>
+<sec:authorize access="hasRole('ROLE_ADMIN')" var="adminRole"/>
+<sec:authorize access="isAuthenticated()" var="auth">
+	<sec:authentication property="principal" var="principal"/>
+</sec:authorize>
+
+
 <%-- 기본 URL --%>
 <c:url var="_BASE_PARAM" value="">
 	<c:param name="pageIndex" value="${searchVO.pageIndex}"/>
@@ -61,39 +68,58 @@
 	</div>
 </div>
 <%-- 게시글 액션 영역 --%>
-<div style="border: 0; text-align: left;">
+<div style="border: 0; display: flex; justify-content: space-between;">
 	<c:if test="${not empty searchVO.boardIdNum}">
-		<c:url var="udtUrl" value="/board/${searchVO.boardIdNum}/edit${_BASE_PARAM}"/>
-		<c:url var="delUrl" value="/board/${searchVO.boardIdNum}/delete${_BASE_PARAM}"/>
-		<form id="delForm" action="${delUrl}" method="post" style="display: none;">
-			<input type="hidden" name="registerId" value="${result.registerId}" />
-			<sec:csrfInput/>
-		</form>
-		<c:choose>
-			<%-- 글 작성자 확인 --%>
-			<c:when test="${userId == result.registerId}">
+		<div style="border: 0; margin: 0;">
+			<c:url var="udtUrl" value="/board/${searchVO.boardIdNum}/edit${_BASE_PARAM}"/>
+			<c:url var="delUrl" value="/board/${searchVO.boardIdNum}/delete${_BASE_PARAM}"/>
+			<form id="delForm" action="${delUrl}" method="post" style="display: none;">
+				<input type="hidden" name="registerId" value="${result.registerId}" />
+				<sec:csrfInput/>
+			</form>
+			<c:url var="listUrl" value="/board${_BASE_PARAM}"/>
+			<a href="${listUrl}" class="btn">목록</a>
+			<c:if test="${userId == result.registerId || adminRole}">
 				<a href="${udtUrl}">수정</a>
+			</c:if>
+			<c:if test="${userId == result.registerId || mngRole}">
 				<a id="btn-del" class="btn" href="#">삭제</a>
-			</c:when>
-            <%-- 관리자 또는 매니저에게 수정 및 삭제 링크 표시 --%>
-			<c:otherwise>
-	            <sec:authorize access="hasRole('ROLE_ADMIN')">
-	                <a href="${udtUrl}">수정</a>
-	            </sec:authorize>
-	            <sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')">
-					<a id="btn-del" class="btn" href="#">삭제</a>
-	            </sec:authorize>
-	       </c:otherwise>
-		</c:choose>
+			</c:if>
+		</div>
+		<c:if test="${mngRole}">
+			<div style="border: 1px solid #ccc; border-radius: 5px; text-align: center; margin: 0;">
+				<c:url var="udtSttusUrl" value="/board/${searchVO.boardIdNum}/update-status"/>
+				<form action="${udtSttusUrl}" method="post">
+					<label for="category">카테고리 변경</label>
+					<select id="category" name="category">
+						<option value="1" ${result.category eq '1' ? 'selected' : ''}>일반</option>
+						<option value="2" ${result.category eq '2' ? 'selected' : ''}>정보</option>
+						<option value="3" ${result.category eq '3' ? 'selected' : ''}>질문</option>
+						<option value="4" ${result.category eq '4' ? 'selected' : ''}>건의&신고</option>
+					</select>
+					<label for="isNotice">공지 여부 변경</label>
+					<select name="isNotice" id="isNotice">
+						<option value="Y" ${result.isNotice eq 'Y' ? 'selected' : ''}>예</option>
+						<option value="N" ${result.isNotice eq 'N' ? 'selected' : ''}>아니오</option>
+					</select>
+					<label for="othbcAt" id="othbcAtLabel">비공개 여부 변경</label>
+					<select name="othbcAt" id="othbcAt">
+						<option value="Y" ${result.othbcAt eq 'Y' ? 'selected' : ''}>예</option>
+						<option value="N" ${result.othbcAt eq 'N' ? 'selected' : ''}>아니오</option>
+					</select>
+					<input type="submit" value="적용">
+					<sec:csrfInput/>
+				</form>
+			</div>
+		</c:if>
 	</c:if>
-	<c:url var="listUrl" value="/board${_BASE_PARAM}"/>
-	<a href="${listUrl}" class="btn">목록</a>
 </div>
 <%-- 덧글 영역 --%>
 <c:import url="/WEB-INF/views/board/Reply.jsp" charEncoding="utf-8"/>
 
 <script>
 	$(document).ready(function() {
+		console.log($('input:checkbox[id="chk1"]').val());
 		var token = $("meta[name='_csrf']").attr("content");
 		var header = $("meta[name='_csrf_header']").attr("content");
 		var boardIdNum = $("#boardIdNum").val();
@@ -143,6 +169,14 @@
 			$("#delForm").submit();
 		});
 		
+		$('#isNotice').change(function() {
+			if ($('#isNotice').val() == 'Y') {
+				$('#othbcAt').prop('disabled', true);
+				$('#othbcAt').val('N');
+			} else {
+				$('#othbcAt').prop('disabled', false);
+			}
+		});
 	});
 
 <c:if test="${not empty sessionScope.message}">
