@@ -1,5 +1,6 @@
 package community.board.web;
 
+import java.io.BufferedInputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import community.board.service.BoardService;
 import community.board.service.BoardVO;
+import community.cmm.MimeTypeMapper;
 import community.cmm.service.CommonService;
 import community.cmm.service.FileService;
 import community.cmm.service.FileVO;
@@ -47,6 +50,10 @@ public class BoardController {
 	/** commService DI */
 	@Autowired
 	private FileService fileService;
+	
+	/** mimeTypeMapper DI */
+	@Autowired
+	private MimeTypeMapper mimeTypeMapper;
 	
 	@Value("${Globals.ImagePath}")
 	private String uploadDir;
@@ -185,26 +192,30 @@ public class BoardController {
 	@PostMapping("/board/uploadImage")
 	public void uploadImage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// 파일 정보 가져오기
-		String fileName = URLDecoder.decode(request.getHeader("file-name"), StandardCharsets.UTF_8.toString());
-		String fileNameSuffix = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+		String fileFullName = URLDecoder.decode(request.getHeader("file-name"), StandardCharsets.UTF_8.toString());
+		String fileName = fileFullName.substring(0, fileFullName.lastIndexOf("."));
 		String fileSize = request.getHeader("file-size");
-		String fileType = request.getHeader("file-Type");
-//		String defaultPath = request.getSession().getServletContext().getRealPath("/");
 		String defaultPath = uploadDir;
-//		String filePath = defaultPath + "image" + File.separator;
 		String filePath = defaultPath;
+		BufferedInputStream bufferedInputStream = new BufferedInputStream(request.getInputStream());
+		bufferedInputStream.mark(Integer.MAX_VALUE); // 스트림 유지를 위한 마킹
+		Tika tika = new Tika();
+		String detectMIME = tika.detect(bufferedInputStream); // MIME 타입 확인
+		String extension = mimeTypeMapper.getExtension(detectMIME); // MIME에 따른 확장자 셋
+		bufferedInputStream.reset(); // 스트림 마킹지점 재설정
+		
 
 		// vo에 담기
 		FileVO vo = new FileVO();
-		vo.setInputStream(request.getInputStream());
+		vo.setInputStream(bufferedInputStream);
 		vo.setOrignlFileNm(fileName); // 파일 이름
-		vo.setFileExtsn(fileNameSuffix); // 파일 확장자
+		vo.setFileExtsn(extension); // 파일 확장자
 		vo.setFileSize(fileSize); // 파일 사이즈
 		vo.setFileStreCours(filePath); // 파일 경로
 		
 		log.info("fileName : {}", vo.getOrignlFileNm());
-		log.info("fileType : {}", fileType);
-		log.info("fileNmSuff : {}", vo.getFileExtsn());
+		log.info("MIME Type : {}", detectMIME);
+		log.info("imageExtension : {}", vo.getFileExtsn());
 		log.info("fileSize : {}", vo.getFileSize());
 		log.info("filePath : {}", vo.getFileStreCours());
 
@@ -216,7 +227,7 @@ public class BoardController {
 					
 					// 이미지 사전 업로드 파일 아이디를 위한 쿠키
 					vo.setAtchFileId(cookie.getValue());
-					log.info("Temporary Unique Value: " + vo.getAtchFileId());
+					log.info("Temporary FileId: " + vo.getAtchFileId());
 					
 					String fileInfo = fileService.uploadImage(vo); // 업로드
 					

@@ -111,8 +111,8 @@
 			        </sec:authorize>
 			    </c:when>
 			</c:choose>
-			<a id="btn-reg" class="btn" href="#">${btnText}</a>
-			<a href="${cslUrl}" id="btn-cnl">취소</a>
+			<button type="button" id="btn-reg">${btnText}</button>
+			<button type="button" id="btn-reg" onclick="location.href='${cslUrl}'">취소</button>
 		</div>
 		<sec:csrfInput/>
 	</form>
@@ -177,6 +177,7 @@ window.addEventListener('beforeunload', function() {
 			if (!regist()) {
 				return false;
 			}
+			$("#btn-reg").prop("disabled", true);
 			$("#form").submit();
  			return false;
 		});

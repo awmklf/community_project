@@ -3,8 +3,8 @@
 	var htImageInfo = [];		//image file정보 저장
 	var aResult = [];
 	
-	var rFilter = /^(image\/bmp|image\/gif|image\/jpg|image\/jpeg|image\/png)$/i;  
-	var rFilter2 = /^(bmp|gif|jpg|jpeg|png)$/i; 
+	var rFilter = /^(image\/bmp|image\/gif|image\/jpg|image\/jpeg|image\/png|image\/tiff|image\/webp)$/i; // 09.12 이미지 타입 추가
+	var rFilter2 = /^(bmp|gif|jpg|jpeg|png|tiff|tif|webp)$/i;  // 09.12 TIFF, WebP 추가
 	var nTotalSize = 0;
 	var nMaxImageSize = 10*1024*1024;
 	var nMaxTotalImageSize = 50*1024*1024;
@@ -255,7 +255,7 @@
 			
 			for (var i = 0, j = nImageFileCount ; i < nCount ; i++){
 				if (!rFilter.test(files[i].type)) {
-					alert("이미지파일 (jpg,gif,png,bmp)만 업로드 가능합니다.");
+					alert("이미지파일만 업로드 가능합니다. \n(JPG, GIF, PNG, BMP, TIFF, WebP, HEIC)"); // 09.12 이미지 타입 추가
 				} else if(files[i].size > nMaxImageSize){
 					alert("이미지 용량이 10MB를 초과하여 등록할 수 없습니다.");
 				} else {
@@ -309,7 +309,7 @@
 		bExceedLimitTotalSize = checkTotalImageSize(ofile.size);
 
 		if( !!bExceedLimitTotalSize ){
-			alert("전체 이미지 용량이 50MB를 초과하여 등록할 수 없습니다. \n\n (파일명 : "+sFileName+", 사이즈 : "+sFileSize+")");
+			alert("전체 이미지 용량이 50MB를 초과하여 등록할 수 없습니다. \n (파일명 : "+sFileName+", 사이즈 : "+sFileSize+")");
 		} else {
 			//이미지 정보 저장							
 			htImageInfo['img'+nImageInfoCnt] = ofile;
@@ -384,7 +384,7 @@
 					if (res.readyState() == 4) {
 						if(sResString.indexOf("NOTALLOW_") > -1){
 							var sFileName = sResString.replace("NOTALLOW_", "");
-							alert("이미지 파일(jpg,gif,png,bmp)만 업로드 하실 수 있습니다. ("+sFileName+")");
+							alert("올바른 이미지 파일 포맷이 아닙니다."); // 09.12 문자열 수정
 							reject(new Error('Invalid file type: ' + sFileName));
 						}else{
 							//성공 시에  responseText를 가지고 array로 만드는 부분.

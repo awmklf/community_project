@@ -1,8 +1,7 @@
 package community.cmm.service;
 
+import java.io.BufferedInputStream;
 import java.time.LocalDateTime;
-
-import javax.servlet.ServletInputStream;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,7 +13,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class FileVO {
-	
+
 	private MultipartFile upFile;
 
 	/** 첨부파일ID */
@@ -37,9 +36,9 @@ public class FileVO {
 	private String fileExtsn;
 	/** 첨부파일 크기 */
 	private String fileSize;
-	
+
 	/** 업로드 처리용 인풋스트림 */
-	ServletInputStream inputStream;
+	BufferedInputStream inputStream;
 	/** 이미지 체크용 게시글 내용 */
 	private String boardCn;
 	/** 게시글 사용 여부 */
