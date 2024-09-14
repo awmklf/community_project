@@ -29,6 +29,12 @@
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
 	
+	<!-- CommonsMultipartResolver 등록 -->
+	<beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<beans:property name="maxUploadSize" value="-1"/>
+		<beans:property name="defaultEncoding" value="utf-8"/>
+	</beans:bean>
+	
 	<!-- 컨트롤러 어노테이션 스캔 -->
 	<context:component-scan base-package="community"  use-default-filters="false">
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>

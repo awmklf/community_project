@@ -7,18 +7,22 @@
 <body>
     <script type="text/javascript">
         // execute callback script
+        console.log('execute callback script');
         var sUrl = document.location.search.substr(1);
 		if (sUrl != "blank") {
 	        var oParameter = {}; // query array
-
+	        console.log('blank 통과');
 	        sUrl.replace(/([^=]+)=([^&]*)(&|$)/g, function(){
 	            oParameter[arguments[1]] = arguments[2];
+	            console.log('replace 통과');
 	            return "";
 	        });
 	        
 	        if ((oParameter.errstr || '').length) { // on error
+	        	console.log('에러');
 	            (parent.jindo.FileUploader._oCallback[oParameter.callback_func+'_error'])(oParameter);
 	        } else {
+	        	console.log('성공');
 		        (parent.jindo.FileUploader._oCallback[oParameter.callback_func+'_success'])(oParameter);
 		   }
 		}

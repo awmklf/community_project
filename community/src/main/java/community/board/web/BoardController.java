@@ -42,27 +42,26 @@ public class BoardController {
 	/** boardService DI */
 	@Autowired
 	private BoardService boardService;
-	
+
 	/** commService DI */
 	@Autowired
 	private CommonService cmmService;
-	
+
 	/** commService DI */
 	@Autowired
 	private FileService fileService;
-	
+
 	/** mimeTypeMapper DI */
 	@Autowired
 	private MimeTypeMapper mimeTypeMapper;
-	
+
 	@Value("${Globals.ImagePath}")
 	private String uploadDir;
-	
 
 	/** 게시글 목록 조회 */
 	@GetMapping("/board")
 	public String boardSelectList(@ModelAttribute("searchVO") BoardVO vo, HttpServletRequest req, ModelMap model) throws Exception {
-		
+
 		// 공지 영역 게시글
 		vo.setIsNotice("Y");
 		Map<String, Object> noticeResultList = boardService.selectBoardList(vo);
@@ -102,7 +101,7 @@ public class BoardController {
 	}
 
 	/** 게시글 작성 및 수정 폼 */
-	@GetMapping({"/board/write", "/board/{boardIdNum}/edit"})
+	@GetMapping({ "/board/write", "/board/{boardIdNum}/edit" })
 	@PreAuthorize("isAuthenticated()")
 	public String boardRegist(@ModelAttribute("searchVO") BoardVO vo, ModelMap model) throws Exception {
 		BoardVO result = new BoardVO();
@@ -139,7 +138,7 @@ public class BoardController {
 		boardService.updateBoard(vo);
 		return "redirect:/board/" + vo.getBoardIdNum();
 	}
-	
+
 	/** 게시글 상태 변경 */
 	@PostMapping("/board/{boardIdNum}/update-status")
 	@PreAuthorize("isAuthenticated()")
@@ -175,35 +174,33 @@ public class BoardController {
 		map.put("recCnt", recCnt);
 		return map;
 	}
-	
-	
+
 	/** 이미지 업로드를 위한 임시아이디 */
 	@ResponseBody
 	@GetMapping("/temp-id")
 	public HashMap<String, Object> getTempImageId() throws Exception {
+		
 		HashMap<String, Object> map = new HashMap<String, Object>();
-
+		
 		map.put("tempImageId", UUID.randomUUID().toString());
 
 		return map;
 	}
-	
-	/** 스마트에디터 이미지 업로드 */
+
+	/** 스마트에디터 멀티 이미지 업로드 */
 	@PostMapping("/board/uploadImage")
 	public void uploadImage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		// 파일 정보 가져오기
 		String fileFullName = URLDecoder.decode(request.getHeader("file-name"), StandardCharsets.UTF_8.toString());
 		String fileName = fileFullName.substring(0, fileFullName.lastIndexOf("."));
 		String fileSize = request.getHeader("file-size");
-		String defaultPath = uploadDir;
-		String filePath = defaultPath;
+		String filePath = uploadDir;
 		BufferedInputStream bufferedInputStream = new BufferedInputStream(request.getInputStream());
 		bufferedInputStream.mark(Integer.MAX_VALUE); // 스트림 유지를 위한 마킹
 		Tika tika = new Tika();
 		String detectMIME = tika.detect(bufferedInputStream); // MIME 타입 확인
 		String extension = mimeTypeMapper.getExtension(detectMIME); // MIME에 따른 확장자 셋
 		bufferedInputStream.reset(); // 스트림 마킹지점 재설정
-		
 
 		// vo에 담기
 		FileVO vo = new FileVO();
@@ -212,25 +209,19 @@ public class BoardController {
 		vo.setFileExtsn(extension); // 파일 확장자
 		vo.setFileSize(fileSize); // 파일 사이즈
 		vo.setFileStreCours(filePath); // 파일 경로
-		
-		log.info("fileName : {}", vo.getOrignlFileNm());
-		log.info("MIME Type : {}", detectMIME);
-		log.info("imageExtension : {}", vo.getFileExtsn());
-		log.info("fileSize : {}", vo.getFileSize());
-		log.info("filePath : {}", vo.getFileStreCours());
 
 		// 이미지 업로드 진행
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
 				if ("tempUniqueVal".equals(cookie.getName())) {
-					
+
 					// 이미지 사전 업로드 파일 아이디를 위한 쿠키
 					vo.setAtchFileId(cookie.getValue());
 					log.info("Temporary FileId: " + vo.getAtchFileId());
-					
+
 					String fileInfo = fileService.uploadImage(vo); // 업로드
-					
+
 					// 파일 정보 반환
 					response.setCharacterEncoding("UTF-8");
 					response.getWriter().println(fileInfo);
@@ -242,4 +233,56 @@ public class BoardController {
 
 	}
 
+	/** 스마트에디터 싱글 이미지 업로드 */
+	@ResponseBody
+	@PostMapping("/board/uploadSingleImage")
+	public Map<String, String> handleFileUpload(FileVO vo, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		HashMap<String, String> map = new HashMap<String, String>();
+
+		// 파일이 존재하면
+		if (!vo.getFile().isEmpty()) {
+			
+			// 파일 정보 가져오기
+			String fileFullName = vo.getFile().getOriginalFilename(); // 파일이름
+			String fileName = fileFullName.substring(0, fileFullName.lastIndexOf("."));
+			Long fileSize = vo.getFile().getSize();
+			String filePath = uploadDir;
+			BufferedInputStream bufferedInputStream = new BufferedInputStream(vo.getFile().getInputStream());
+			bufferedInputStream.mark(Integer.MAX_VALUE); // 스트림 유지를 위한 마킹
+			Tika tika = new Tika();
+			String detectMIME = tika.detect(bufferedInputStream); // MIME 타입 확인
+			String extension = mimeTypeMapper.getExtension(detectMIME); // MIME에 따른 확장자 셋
+			bufferedInputStream.reset(); // 스트림 마킹지점 재설정
+
+			// vo에 담기
+			vo.setInputStream(bufferedInputStream);
+			vo.setOrignlFileNm(fileName); // 파일 이름
+			vo.setFileExtsn(extension); // 파일 확장자
+			vo.setFileSize(fileSize.toString()); // 파일 사이즈
+			vo.setFileStreCours(filePath); // 파일 경로
+
+			// 이미지 업로드 진행
+			Cookie[] cookies = request.getCookies();
+			if (cookies != null) {
+				for (Cookie cookie : cookies) {
+					if ("tempUniqueVal".equals(cookie.getName())) {
+
+						// 이미지 사전 업로드 파일 아이디를 위한 쿠키
+						vo.setAtchFileId(cookie.getValue());
+						log.info("Temporary FileId: " + vo.getAtchFileId());
+
+						String fileInfo = fileService.uploadImage(vo); // 업로드
+
+						// 파일 정보 반환
+						log.info("fileInfo : {}", fileInfo);
+						map.put("responseText", fileInfo);
+						return map;
+					}
+				}
+			}
+		}
+		map.put("e", "업로드 중 오류가 발생했습니다.");
+		return map;
+	}
 }

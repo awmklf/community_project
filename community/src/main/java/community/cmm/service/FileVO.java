@@ -43,5 +43,8 @@ public class FileVO {
 	private String boardCn;
 	/** 게시글 사용 여부 */
 	private String useAtBoard;
+	/** 싱글이미지 처리용 */
+	private MultipartFile file;
+	
 
 }
