@@ -5,7 +5,6 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -31,8 +30,7 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
 		else
 			errorMessage = "로그인 중 문제가 발생했습니다.";
 
-		HttpSession session = req.getSession();
-		session.setAttribute("errorMessage", errorMessage);
+		req.setAttribute("message", errorMessage);
 		setDefaultFailureUrl("/user/login");
 		super.onAuthenticationFailure(req, resp, e);
 	}
