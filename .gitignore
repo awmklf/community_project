@@ -152,3 +152,6 @@ $RECYCLE.BIN/
 
 .vs/config/
 .vs/
+
+# ignore specific property files
+src/main/resources/properties/*.properties
