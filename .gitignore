@@ -154,4 +154,4 @@ $RECYCLE.BIN/
 .vs/
 
 # ignore specific property files
-src/main/resources/properties/*.properties
+**/properties/*.properties
