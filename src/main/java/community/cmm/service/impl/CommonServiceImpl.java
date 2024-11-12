@@ -31,16 +31,15 @@ public class CommonServiceImpl implements CommonService {
 		boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 		boolean isManager = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_MANAGER"));
 		boolean isOwner = authentication.getName().equals(registerId);
-		log.debug("isAdmin : {}, isManager : {}, isOwner : {}",isAdmin, isManager, isOwner);
-		if (isAdmin)
+		log.debug("isAdmin : {}, isManager : {}, isOwner : {}", isAdmin, isManager, isOwner);
+		if (isAdmin) {
 			return "admin";
-		else if (isManager) {
-			if (isOwner)
-				return "manager-owner";
-			return "manager";
-		} else if (isOwner)
+		} else if (isManager) {
+			return isOwner ? "manager-owner" : "manager";
+		} else if (isOwner) {
 			return "owner";
-		else
+		} else {
 			throw new AccessDeniedException("접근 권한이 없습니다. 관리자 또는 본인만 접근 가능합니다.");
+		}
 	}
 }

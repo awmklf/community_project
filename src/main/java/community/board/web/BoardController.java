@@ -84,15 +84,18 @@ public class BoardController {
 
 	/** 게시글 내용 조회 */
 	@GetMapping("/board/{boardIdNum}")
-	public String boardSelect(@ModelAttribute("searchVO") BoardVO vo, HttpServletRequest request, ModelMap model, HttpSession session) throws Exception {
+	public String boardSelect(@ModelAttribute("searchVO") BoardVO vo, HttpServletRequest request, ModelMap model) throws Exception {
+		// 조회수 어뷰징 방지를 위한 유저 ID, IP 정보 담기
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser"))
 			vo.setUserId(auth.getName()); // 아이디 저장(로그인 유저의 경우)
 		vo.setUserIp(request.getRemoteAddr()); // 아이피 저장
-		vo.setTriggerViewCntUp("Y"); // 조회수 증가 허용
+		
+		vo.setTriggerViewCntUp("Y"); // 조회수 증가 트리거
 
 		BoardVO result = boardService.selectBoard(vo);
 
+		// 존재하지 않는 게시글의 경우
 		if (result == null)
 			return "cmm/error/404";
 
@@ -143,8 +146,6 @@ public class BoardController {
 	@PostMapping("/board/{boardIdNum}/update-status")
 	@PreAuthorize("isAuthenticated()")
 	public String updateStatus(@ModelAttribute("searchVO") BoardVO vo, HttpServletRequest req) throws Exception {
-		System.out.println("1 : " + vo.getCategory());
-		System.out.println("2 : " + vo.getOthbcAt());
 		boardService.udtStatusBoard(vo);
 		return "redirect:" + req.getHeader("Referer");
 	}

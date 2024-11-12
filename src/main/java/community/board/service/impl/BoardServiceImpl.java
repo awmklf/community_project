@@ -108,16 +108,17 @@ public class BoardServiceImpl implements BoardService {
 	/** 게시글 내용 조회 */
 	@Override
 	public BoardVO selectBoard(BoardVO vo) throws Exception {
-		BoardVO result = null;
 
-		if (vo.getBoardIdNum() == null)
-			return result;
+		// 게시글 ID 변환
 		vo.setBoardId(convertNumToBoardId(vo.getBoardIdNum()));
 
-		result = boardDAO.selectBoard(vo);
+		// 게시글 불러오기
+		BoardVO result = boardDAO.selectBoard(vo);
 
-		if (result == null) // 게시글 존재 여부 체크
+		// 게시글이 존재하지 않는 경우
+		if (result == null)
 			return result;
+		
 		result.setBoardIdNum(vo.getBoardIdNum());
 
 		// 비밀글 여부 및 접근 권한 확인
@@ -126,19 +127,24 @@ public class BoardServiceImpl implements BoardService {
 			vo.setRegisterId(result.getRegisterId());
 			roleChk(vo.getRegisterId());
 		}
+		
+		// 조회수 로직 실행
 		if ("Y".equals(vo.getTriggerViewCntUp()) && !result.getRegisterId().equals(vo.getUserId())) {
-			// 조회수 키 생성(게시글 아이디, 유저 아이디, 유저 아이피)
+			// 조회수 키 생성 및 Redis에 키가 있는지 검증
 			String keyForId = "ID:" + vo.getUserId() + ":view:" + vo.getBoardId();
 			String keyForIp = "IP:" + vo.getUserIp() + ":view:" + vo.getBoardId();
-			// 레디스 서버로부터 조회수 키 조회 및 검증
-			Boolean isViewedByUser = (Boolean) redisTemplate.opsForValue().get(keyForId);
+			Boolean isViewedByUser = vo.getUserId() == null ? false : (Boolean) redisTemplate.opsForValue().get(keyForId);
 			Boolean isViewedByIp = (Boolean) redisTemplate.opsForValue().get(keyForIp);
-			if ((isViewedByUser == null || !isViewedByUser) && (isViewedByIp == null || !isViewedByIp)) { // 아이디 및 아이피 이력이 없을 때
-				boardDAO.updateViewCnt(vo); // 조회수 증가
-				result.setInqireCo(result.getInqireCo() + 1);// 뷰에 조회수 +1 갱신
-				// Redis에 조회 정보 저장 (5분 유지)
+			
+			// 아이디 및 아이피 이력이 없을 때
+			if ((isViewedByUser == null || !isViewedByUser) && (isViewedByIp == null || !isViewedByIp)) {
+				boardDAO.updateViewCnt(vo); // 조회수 증가 DB에 반영
+				result.setInqireCo(result.getInqireCo() + 1);// 뷰에 보여줄 조회수 +1 갱신
+				
+				// Redis에 조회 정보(IP) 저장 (5분 유지)
 				redisTemplate.opsForValue().set(keyForIp, true, 5, TimeUnit.MINUTES);
-				if (vo.getUserId() != null) // 비로그인 유저 저장 방지
+				// 로그인 유저인 경우 ID 저장
+				if (vo.getUserId() != null)
 					redisTemplate.opsForValue().set(keyForId, true, 5, TimeUnit.MINUTES);
 			}
 		}

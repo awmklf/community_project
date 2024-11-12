@@ -153,8 +153,13 @@ function generateUniqueValue() {
 		});
 	</c:otherwise>
 </c:choose>
-// 페이지를 벗어나면 쿠키 삭제
+
 window.addEventListener('beforeunload', function() {
+	// 페이지 나가기 방지
+	event.preventDefault();
+	event.returnValue = '';
+	
+	// 페이지를 벗어나면 쿠키 삭제
     document.cookie = 'tempUniqueVal=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 });
 </script>

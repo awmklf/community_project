@@ -91,7 +91,7 @@ public class PaginationCalc {
 	/** 쿼리 시작 rownum */
 	public int getFirstRecordIndex() {
 		firstRecordIndex = (getCurrentPageNo() - 1) * getRecordCountPerPage();
-		return firstRecordIndex;
+		return firstRecordIndex < 0 ? 0 : firstRecordIndex;
 	}
 
 	/** 쿼리 마지막 rownum */
